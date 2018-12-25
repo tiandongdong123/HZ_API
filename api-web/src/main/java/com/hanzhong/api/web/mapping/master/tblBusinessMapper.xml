@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hanzhong.api.web.dao.master.TblBusinessDao">
+    <resultMap id="CompanyInfoMap" type="com.hanzhong.api.web.model.bo.CompanyInfoBO">
+        <result column="PRIPID" property="pripId" jdbcType="VARCHAR"/>
+        <result column="ENTNAME" property="entName" jdbcType="VARCHAR"/>
+        <result column="ORIREGNO" property="oriRegNo" jdbcType="VARCHAR"/>
+        <result column="REGNO" property="regNo" jdbcType="VARCHAR"/>
+        <result column="REGCAP" property="regCap" jdbcType="DECIMAL"/>
+        <result column="REGCAPCUR" property="regCapCur" jdbcType="VARCHAR"/>
+        <result column="ENTTYPE" property="entType" jdbcType="VARCHAR"/>
+        <result column="S_EXT_ENTPROPERTY" property="sExtEntProperty" jdbcType="VARCHAR"/>
+        <result column="ENTSTATUS" property="entStatus" jdbcType="VARCHAR"/>
+        <result column="ABUITEM" property="abuItem" jdbcType="VARCHAR"/>
+        <result column="CBUITEM" property="cbuItem" jdbcType="VARCHAR"/>
+        <result column="OPSCOPE" property="opScope" jdbcType="VARCHAR"/>
+        <result column="ESDATE" property="esDate" jdbcType="DATE"/>
+        <result column="APPRDATE" property="apprDate" jdbcType="DATE"/>
+        <result column="OPFROM" property="opFrom" jdbcType="DATE"/>
+        <result column="OPTO" property="opTo" jdbcType="DATE"/>
+        <result column="NAME" property="name" jdbcType="VARCHAR"/>
+        <result column="REGORG" property="regOrg" jdbcType="VARCHAR"/>
+        <result column="DOM" property="dom" jdbcType="VARCHAR"/>
+        <result column="OPLOC" property="opLoc" jdbcType="VARCHAR"/>
+        <result column="POSTALCODE" property="postalCode" jdbcType="VARCHAR"/>
+        <result column="LOCALADM" property="localAdm" jdbcType="VARCHAR"/>
+        <result column="ASSDATE" property="assDate" jdbcType="DATE"/>
+        <result column="ENTCAT" property="entCat" jdbcType="VARCHAR"/>
+        <result column="OPFORM" property="opForm" jdbcType="VARCHAR"/>
+        <result column="OPSCOANDFORM" property="opScoAndForm" jdbcType="VARCHAR"/>
+        <result column="PTBUSSCOPE" property="ptBusScope" jdbcType="VARCHAR"/>
+        <result column="DOMDISTRICT" property="domDistrict" jdbcType="VARCHAR"/>
+        <result column="ECOTECDEVZONE" property="ecoTecDevZone" jdbcType="VARCHAR"/>
+        <result column="DOMPRORIGHT" property="domProRight" jdbcType="VARCHAR"/>
+        <result column="OPLOCDISTRICT" property="opLocDistrict" jdbcType="VARCHAR"/>
+        <result column="INSFORM" property="insForm" jdbcType="VARCHAR"/>
+        <result column="PARNUM" property="parNum" jdbcType="BIGINT"/>
+        <result column="LIMPARNUM" property="limParNum" jdbcType="BIGINT"/>
+        <result column="PARFORM" property="parForm" jdbcType="VARCHAR"/>
+        <result column="EXENUM" property="exeNum" jdbcType="BIGINT"/>
+        <result column="EMPNUM" property="empNum" jdbcType="BIGINT"/>
+    </resultMap>
+
+    <!--获取企业信息-->
+    <select id="getCompanyInfoList" parameterType="com.hanzhong.api.web.model.bo.CompanyQryBO"
+            resultMap="CompanyInfoMap">
+        SELECT
+        PRIPID, ENTNAME,ORIREGNO,REGNO,REGCAP,REGCAPCUR,ENTTYPE,S_EXT_ENTPROPERTY,ENTSTATUS,ABUITEM,CBUITEM,OPSCOPE,
+        ESDATE,APPRDATE,OPFROM,OPTO,NAME,REGORG,DOM,OPLOC,POSTALCODE,LOCALADM,ASSDATE,ENTCAT,OPFORM,OPSCOANDFORM,
+        PTBUSSCOPE,DOMDISTRICT,ECOTECDEVZONE,DOMPRORIGHT,OPLOCDISTRICT,INSFORM,PARNUM,LIMPARNUM,PARFORM,EXENUM,EMPNUM
+        FROM tblBusiness
+        <where>
+            <if test="companyName != null and companyName != ''">
+                AND ENTNAME = #{companyName}
+            </if>
+            <if test="usCreditCode != null and usCreditCode != ''">
+                AND CREDITCODE = #{usCreditCode}
+            </if>
+            <if test="orgCode != null and orgCode != ''">
+                AND ORGCODE = #{orgCode}
+            </if>
+            <if test="entStatus != null and entStatus != ''">
+                AND ENTSTATUS = #{entStatus}
+            </if>
+        </where>
+    </select>
+
+
+
+</mapper>
