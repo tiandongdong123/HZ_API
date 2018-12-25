@@ -1,5 +1,8 @@
-package com.hanzhong.api.web.model.bo;
+package com.hanzhong.api.web.model.vo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -10,7 +13,9 @@ import java.util.Date;
  *  @Date 2018/11/7 19:27 
  *  @Version  V1.0   
  */
-public class CompanyInfoBO {
+public class CompanyInfoVO implements Serializable {
+
+    private static final long serialVersionUID = -4963266899668807475L;
 
     /**
      * 主体身份代码
@@ -88,18 +93,6 @@ public class CompanyInfoBO {
      * 住所所在经济开发区
      */
     private String ecoTecDevZone;
-    /**
-     * 省份
-     */
-    private Integer province;
-    /**
-     * 市
-     */
-    private Integer city;
-    /**
-     * 区
-     */
-    private Integer area;
 
     public String getPripId() {
         return pripId;
@@ -165,6 +158,7 @@ public class CompanyInfoBO {
         this.opScope = opScope;
     }
 
+    @JsonFormat(pattern = "yyyy-MM-dd")
     public Date getEsDate() {
         return esDate;
     }
@@ -173,6 +167,7 @@ public class CompanyInfoBO {
         this.esDate = esDate;
     }
 
+    @JsonFormat(pattern = "yyyy-MM-dd")
     public Date getApprDate() {
         return apprDate;
     }
@@ -181,6 +176,7 @@ public class CompanyInfoBO {
         this.apprDate = apprDate;
     }
 
+    @JsonFormat(pattern = "yyyy-MM-dd")
     public Date getOpFrom() {
         return opFrom;
     }
@@ -189,6 +185,7 @@ public class CompanyInfoBO {
         this.opFrom = opFrom;
     }
 
+    @JsonFormat(pattern = "yyyy-MM-dd")
     public Date getOpTo() {
         return opTo;
     }
@@ -253,30 +250,6 @@ public class CompanyInfoBO {
         this.ecoTecDevZone = ecoTecDevZone;
     }
 
-    public Integer getProvince() {
-        return province;
-    }
-
-    public void setProvince(Integer province) {
-        this.province = province;
-    }
-
-    public Integer getCity() {
-        return city;
-    }
-
-    public void setCity(Integer city) {
-        this.city = city;
-    }
-
-    public Integer getArea() {
-        return area;
-    }
-
-    public void setArea(Integer area) {
-        this.area = area;
-    }
-
     @Override
     public String toString() {
         return "CompanyInfoBO{" +
@@ -299,9 +272,6 @@ public class CompanyInfoBO {
                 ", postalCode='" + postalCode + '\'' +
                 ", domDistrict='" + domDistrict + '\'' +
                 ", ecoTecDevZone='" + ecoTecDevZone + '\'' +
-                ", province='" + province + '\'' +
-                ", city='" + city + '\'' +
-                ", area='" + area + '\'' +
                 '}';
     }
 }

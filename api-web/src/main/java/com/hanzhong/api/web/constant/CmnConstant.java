@@ -8,4 +8,6 @@ package com.hanzhong.api.web.constant;
  *  @Version  V1.0   
  */
 public class CmnConstant {
+
+
 }

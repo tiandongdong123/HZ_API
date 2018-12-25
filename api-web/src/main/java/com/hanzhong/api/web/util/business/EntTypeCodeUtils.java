@@ -1,13 +1,8 @@
 package com.hanzhong.api.web.util.business;
 
 import com.hanzhong.api.web.constant.cmnenum.LoggerEnum;
-import com.hanzhong.api.web.util.ExcelUtils;
 import com.hanzhong.api.web.util.LoggerUtils;
 import com.hanzhong.api.web.util.PropertiesUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,11 +47,6 @@ public class EntTypeCodeUtils {
      * @return String
      */
     public static String getNameByCode(String code) {
-
-        if (codeMap == null || codeMap.isEmpty()) {
-            // 缓存代码
-            cacheCodeMap();
-        }
         return codeMap.get(code);
     }
 
@@ -65,12 +55,7 @@ public class EntTypeCodeUtils {
      */
     private static void cacheCodeMap() {
         try {
-            CommonUtils.CacheCodeParam codeParam = new CommonUtils.CacheCodeParam();
-            codeParam.setFilePath(ENT_TYPE_CODE_FILE_PATH);
-            codeParam.setSheetName(ENT_TYPE_CODE_FILE_SHEET_NAME);
-            codeParam.setCodeColumnNum(0);
-            codeParam.setNameColumnNum(1);
-            codeMap = CommonUtils.cacheCodeMapExcludeChineseRow(codeParam);
+            codeMap = CommonUtils.cacheCodeMapExcludeChineseRow(ENT_TYPE_CODE_FILE_PATH, ENT_TYPE_CODE_FILE_SHEET_NAME);
         } catch (IOException e) {
             LoggerUtils.appendErrorLog(logger, "文件：【{}】，sheet：【{}】,缓存代码(cacheCodeMap())出现异常：", ENT_TYPE_CODE_FILE_PATH, ENT_TYPE_CODE_FILE_SHEET_NAME, e);
         }

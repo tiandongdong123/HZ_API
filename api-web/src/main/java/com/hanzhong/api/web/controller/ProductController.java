@@ -6,13 +6,16 @@ import com.hanzhong.api.web.constant.cmnenum.ResultCodeEnum;
 import com.hanzhong.api.web.model.JsonResult;
 import com.hanzhong.api.web.model.bo.CompanyInfoBO;
 import com.hanzhong.api.web.model.bo.CompanyQryBO;
+import com.hanzhong.api.web.model.vo.CompanyInfoVO;
 import com.hanzhong.api.web.service.BusinessService;
 import com.hanzhong.api.web.util.CheckUtils;
 import com.hanzhong.api.web.util.LoggerUtils;
 import com.hanzhong.api.web.util.business.*;
+import com.hanzhong.api.web.util.business.area.AreaCodeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,6 +42,10 @@ public class ProductController {
      * 分隔符-“-”
      */
     private static final String SMALL_MIDDLE_LINE_SEPARATOR = "-";
+    /**
+     * 分隔符-“/”
+     */
+    private static final String SLASH_SEPARATOR = "/";
 
     @Autowired
     private BusinessService businessService;
@@ -53,9 +60,6 @@ public class ProductController {
     @ResponseBody
     public JsonResult getCompanyInfo(HttpServletRequest request) {
         LoggerUtils.appendDebugLog(logger, "getCompanyInfo()的参数值：【{}】", request);
-
-        // 公司名称
-        String companyName = request.getParameter(ProductParamEnum.COMPANY_NAME.getValue());
         // 统一社会信用代码
         String corCodeTy = request.getParameter(ProductParamEnum.COR_CODE_TY.getValue());
         // 组织机构代码
@@ -80,9 +84,9 @@ public class ProductController {
             }
 
             // 获取(在营)企业信息
-            CompanyInfoBO companyInfoBO = getCompanyInfo(request, productParam);
-            if (companyInfoBO != null) {
-                return JsonResultUtils.build(ResultCodeEnum.SUCCESS, companyInfoBO);
+            CompanyInfoVO companyInfoVO = getCompanyInfo(request, productParam);
+            if (companyInfoVO != null) {
+                return JsonResultUtils.build(ResultCodeEnum.SUCCESS, companyInfoVO);
             }
 
             return JsonResultUtils.build(ResultCodeEnum.NO_DATA, null);
@@ -95,15 +99,12 @@ public class ProductController {
     /**
      * 是否符合参数非空
      *
-     * @param request
-     * @param productParam
-     * @return
+     * @param request      请求
+     * @param productParam 产品参数
+     * @return boolean
      */
     private boolean meetNotBlankRequirement(HttpServletRequest request, String productParam) {
-        if (StringUtils.isNotBlank(productParam) && StringUtils.isNotBlank(request.getParameter(productParam))) {
-            return true;
-        }
-        return false;
+        return StringUtils.isNotBlank(productParam) && StringUtils.isNotBlank(request.getParameter(productParam));
     }
 
     /**
@@ -112,9 +113,8 @@ public class ProductController {
      * @param request
      * @param productParam
      * @return 若查询不到企业，则返回null
-     * @throws IllegalArgumentException
      */
-    private CompanyInfoBO getCompanyInfo(HttpServletRequest request, String productParam) throws IllegalArgumentException {
+    private CompanyInfoVO getCompanyInfo(HttpServletRequest request, String productParam) {
         // 设置查询对象
         CompanyQryBO companyQryBO = setCompanyQryBO(request, productParam);
 
@@ -139,56 +139,41 @@ public class ProductController {
      * @param companyInfoBO
      * @return CompanyInfoBO
      */
-    private CompanyInfoBO convertCompanyInfo(CompanyInfoBO companyInfoBO) {
-        String code;
+    private CompanyInfoVO convertCompanyInfo(CompanyInfoBO companyInfoBO) {
+        CompanyInfoVO companyInfoVO = new CompanyInfoVO();
+        // 复制属性值
+        BeanUtils.copyProperties(companyInfoBO, companyInfoVO);
 
+        String code;
         // 企业(机构)类型
-        code = companyInfoBO.getEntType();
+        code = companyInfoVO.getEntType();
         if (StringUtils.isNotBlank(code)) {
-            companyInfoBO.setEntType(EntTypeCodeUtils.getNameByCode(code));
+            companyInfoVO.setEntType(EntTypeCodeUtils.getNameByCode(code));
         }
         // 企业性质
-        code = companyInfoBO.getsExtEntProperty();
+        code = companyInfoVO.getsExtEntProperty();
         if (StringUtils.isNotBlank(code)) {
-            companyInfoBO.setsExtEntProperty(EntNatureCodeUtils.getNameByCode(code));
+            companyInfoVO.setsExtEntProperty(EntNatureCodeUtils.getNameByCode(code));
         }
         // 企业状态
-        code = companyInfoBO.getEntStatus();
+        code = companyInfoVO.getEntStatus();
         if (StringUtils.isNotBlank(code)) {
-            companyInfoBO.setEntStatus(EntStatusEnum.getName(code));
+            companyInfoVO.setEntStatus(EntStatusEnum.getName(code));
         }
         // 登记机关
-        code = companyInfoBO.getRegOrg();
+        code = companyInfoVO.getRegOrg();
         if (StringUtils.isNotBlank(code)) {
-            companyInfoBO.setRegOrg(AdminCodeUtils.getNameByCode(code));
+            companyInfoVO.setRegOrg(AdminCodeUtils.getNameByCode(code));
         }
-        // 属地监管工商所
-        code = companyInfoBO.getLocalAdm();
-        if (StringUtils.isNotBlank(code)) {
-            companyInfoBO.setLocalAdm(LocalAdminCodeUtils.getNameByCode(code));
-        }
-        // 企业分类码
-        code = companyInfoBO.getEntCat();
-        if (StringUtils.isNotBlank(code)) {
-            companyInfoBO.setEntCat(EntClassCodeUtils.getNameByCode(code));
-        }
+        // 住所所在行政区划
+        companyInfoVO.setDomDistrict(getDomDistrictNameByCode(companyInfoBO.getProvince(), companyInfoBO.getCity(), companyInfoBO.getArea()));
         // 住所所在开发区
-        code = companyInfoBO.getEcoTecDevZone();
+        code = companyInfoVO.getEcoTecDevZone();
         if (StringUtils.isNotBlank(code)) {
-            companyInfoBO.setEcoTecDevZone(DevZoneCodeUtils.getNameByCode(code));
-        }
-        // 住所产权
-        code = companyInfoBO.getDomProRight();
-        if (StringUtils.isNotBlank(code)) {
-            companyInfoBO.setDomProRight(DomPropertyCodeUtils.getNameByCode(code));
-        }
-        // 合伙方式
-        code = companyInfoBO.getParForm();
-        if (StringUtils.isNotBlank(code)) {
-            companyInfoBO.setParForm(PartModeCodeUtils.getNameByCode(code));
+            companyInfoVO.setEcoTecDevZone(DevZoneCodeUtils.getNameByCode(code));
         }
 
-        return companyInfoBO;
+        return companyInfoVO;
     }
 
     /**
@@ -198,7 +183,7 @@ public class ProductController {
      * @param productParam
      * @return CompanyQryBO
      */
-    private CompanyQryBO setCompanyQryBO(HttpServletRequest request, String productParam) throws IllegalArgumentException {
+    private CompanyQryBO setCompanyQryBO(HttpServletRequest request, String productParam) {
         CompanyQryBO companyQryBO = new CompanyQryBO();
 
         if (ProductParamEnum.COMPANY_NAME.getValue().equals(productParam)) {
@@ -214,4 +199,31 @@ public class ProductController {
         return companyQryBO;
     }
 
+    /**
+     * 根据行政区划码获取对应省市区名称（以“/”分隔）
+     *
+     * @param areaCode 行政区划码，如：420203
+     * @return String 如：湖北省/黄石市/西塞山区
+     */
+    private String getDomDistrictNameByCode(Integer provinceCode, Integer cityCode, Integer areaCode) {
+        StringBuilder strBuilder = new StringBuilder();
+
+        // 省
+        String provinceName = provinceCode == null ? "" : AreaCodeUtils.getAreaNameByCode(provinceCode.toString());
+        if (StringUtils.isNotEmpty(provinceName)) {
+            strBuilder.append(provinceName);
+        }
+        // 市
+        String cityName = cityCode == null ? "" : AreaCodeUtils.getAreaNameByCode(cityCode.toString());
+        if (StringUtils.isNotEmpty(cityName)) {
+            strBuilder.append(SLASH_SEPARATOR + cityName);
+        }
+        // 区
+        String areaName = areaCode == null ? "" : AreaCodeUtils.getAreaNameByCode(areaCode.toString());
+        if (StringUtils.isNotEmpty(areaName)) {
+            strBuilder.append(SLASH_SEPARATOR + areaName);
+        }
+
+        return strBuilder.toString();
+    }
 }

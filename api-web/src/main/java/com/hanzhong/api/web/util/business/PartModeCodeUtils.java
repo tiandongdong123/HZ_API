@@ -47,10 +47,6 @@ public class PartModeCodeUtils {
      * @return String
      */
     public static String getNameByCode(String code) {
-        if (codeMap == null || codeMap.isEmpty()) {
-            // 缓存代码
-            cacheCodeMap();
-        }
         return codeMap.get(code);
     }
 
@@ -59,12 +55,7 @@ public class PartModeCodeUtils {
      */
     private static void cacheCodeMap() {
         try {
-            CommonUtils.CacheCodeParam codeParam = new CommonUtils.CacheCodeParam();
-            codeParam.setFilePath(PART_MODE_CODE_FILE_PATH);
-            codeParam.setSheetName(PART_MODE_CODE_FILE_SHEET_NAME);
-            codeParam.setCodeColumnNum(0);
-            codeParam.setNameColumnNum(1);
-            codeMap = CommonUtils.cacheCodeMapExcludeChineseRow(codeParam);
+            codeMap = CommonUtils.cacheCodeMapExcludeChineseRow(PART_MODE_CODE_FILE_PATH, PART_MODE_CODE_FILE_SHEET_NAME);
         } catch (IOException e) {
             LoggerUtils.appendErrorLog(logger, "文件：【{}】，sheet：【{}】,缓存代码(cacheCodeMap())出现异常：", PART_MODE_CODE_FILE_PATH, PART_MODE_CODE_FILE_SHEET_NAME, e);
         }

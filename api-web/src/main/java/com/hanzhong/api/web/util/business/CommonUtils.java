@@ -92,8 +92,26 @@ public class CommonUtils {
 
     /**
      * 缓存代码文件(过滤掉代码列含汉字的行)
+     * <br>注：默认第1列为代码列，第2列为代码对应的值
      *
-     * @param codeParam
+     * @param filePath  文件路径（classPath）
+     * @param sheetName sheet名称
+     * @return Map
+     * @throws IOException
+     */
+    public static Map<String, String> cacheCodeMapExcludeChineseRow(String filePath, String sheetName) throws IOException {
+        CacheCodeParam codeParam = new CacheCodeParam();
+        codeParam.setFilePath(filePath);
+        codeParam.setSheetName(sheetName);
+        codeParam.setCodeColumnNum(0);
+        codeParam.setNameColumnNum(1);
+        return cacheCodeMapExcludeChineseRow(codeParam);
+    }
+
+    /**
+     * 缓存代码文件(过滤掉代码列含汉字的行)
+     *
+     * @param codeParam 代码参数
      * @return Map
      * @throws IOException
      */

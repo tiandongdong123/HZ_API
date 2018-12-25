@@ -35,6 +35,10 @@ public class AuthUtils {
     private AuthUtils() {
     }
 
+    static {
+        ipWhiteListMap = getIpWhiteListMap(IP_WHITE_LIST_FILE_PATH);
+    }
+
     /**
      * ip是否授权
      *
@@ -42,15 +46,7 @@ public class AuthUtils {
      * @return boolean
      */
     public static boolean isAuthIp(String ip) {
-
-        if (ipWhiteListMap == null || ipWhiteListMap.isEmpty()) {
-            ipWhiteListMap = getIpWhiteListMap(IP_WHITE_LIST_FILE_PATH);
-        }
-
-        if (ipWhiteListMap != null && ipWhiteListMap.containsKey(ip)) {
-            return true;
-        }
-        return false;
+        return ipWhiteListMap != null && ipWhiteListMap.containsKey(ip);
     }
 
     /**

@@ -52,7 +52,7 @@ public enum ResultCodeEnum {
     /**
      * D008：参数数据不正确（参数输入项不合法）
      */
-    PARAM_("D008", "参数数据不正确（参数输入项不合法）"),
+    PARAM_NOT_LEGAL("D008", "参数数据不正确（参数输入项不合法）"),
     /**
      * D009：系统错误，结果返回超时
      */
@@ -97,15 +97,7 @@ public enum ResultCodeEnum {
         return key;
     }
 
-    public void setKey(String key) {
-        this.key = key;
-    }
-
     public String getValue() {
         return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
     }
 }

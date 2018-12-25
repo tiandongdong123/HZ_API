@@ -47,10 +47,6 @@ public class DevZoneCodeUtils {
      * @return String
      */
     public static String getNameByCode(String code) {
-        if (codeMap == null || codeMap.isEmpty()) {
-            // 缓存代码
-            cacheCodeMap();
-        }
         return codeMap.get(code);
     }
 
@@ -59,12 +55,7 @@ public class DevZoneCodeUtils {
      */
     private static void cacheCodeMap() {
         try {
-            CommonUtils.CacheCodeParam codeParam = new CommonUtils.CacheCodeParam();
-            codeParam.setFilePath(DEV_ZONE_CODE_FILE_PATH);
-            codeParam.setSheetName(DEV_ZONE_CODE_FILE_SHEET_NAME);
-            codeParam.setCodeColumnNum(0);
-            codeParam.setNameColumnNum(1);
-            codeMap = CommonUtils.cacheCodeMapExcludeChineseRow(codeParam);
+            codeMap = CommonUtils.cacheCodeMapExcludeChineseRow(DEV_ZONE_CODE_FILE_PATH, DEV_ZONE_CODE_FILE_SHEET_NAME);
         } catch (IOException e) {
             LoggerUtils.appendErrorLog(logger, "文件：【{}】，sheet：【{}】,缓存代码(cacheCodeMap())出现异常：", DEV_ZONE_CODE_FILE_PATH, DEV_ZONE_CODE_FILE_SHEET_NAME, e);
         }

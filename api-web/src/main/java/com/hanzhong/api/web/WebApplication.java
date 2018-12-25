@@ -7,11 +7,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ImportResource;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
  *  
@@ -44,7 +42,7 @@ public class WebApplication {
     @Bean
     public TaskScheduler taskScheduler() {
         // single threaded by default
-//        return new ConcurrentTaskScheduler();
+        // return new ConcurrentTaskScheduler();
 
         ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
         // 线程池大小(根据定时任务并发执行的实际情况，配置线程池大小)
