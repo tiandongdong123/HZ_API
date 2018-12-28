@@ -158,7 +158,7 @@ public class CompanyInfoVO implements Serializable {
         this.opScope = opScope;
     }
 
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     public Date getEsDate() {
         return esDate;
     }
@@ -167,7 +167,7 @@ public class CompanyInfoVO implements Serializable {
         this.esDate = esDate;
     }
 
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     public Date getApprDate() {
         return apprDate;
     }
@@ -176,7 +176,7 @@ public class CompanyInfoVO implements Serializable {
         this.apprDate = apprDate;
     }
 
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     public Date getOpFrom() {
         return opFrom;
     }
@@ -185,7 +185,7 @@ public class CompanyInfoVO implements Serializable {
         this.opFrom = opFrom;
     }
 
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     public Date getOpTo() {
         return opTo;
     }

@@ -13,6 +13,7 @@ import com.hanzhong.api.web.util.LoggerUtils;
 import com.hanzhong.api.web.util.business.*;
 import com.hanzhong.api.web.util.business.area.AreaCodeUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -23,6 +24,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -160,6 +163,10 @@ public class ProductController {
         if (StringUtils.isNotBlank(code)) {
             companyInfoVO.setEntStatus(EntStatusEnum.getName(code));
         }
+        // 经营(驻在)期限至
+        if (companyInfoVO.getOpFrom() != null && companyInfoVO.getOpTo() == null) {
+            companyInfoVO.setOpTo(getMaxDate());
+        }
         // 登记机关
         code = companyInfoVO.getRegOrg();
         if (StringUtils.isNotBlank(code)) {
@@ -225,5 +232,19 @@ public class ProductController {
         }
 
         return strBuilder.toString();
+    }
+
+    /**
+     * 获取最大日期（4999-12-31）
+     *
+     * @return Date 若异常，则返回null
+     */
+    private Date getMaxDate() {
+        try {
+            return DateUtils.parseDate("4999-12-31", "yyyy-MM-dd");
+        } catch (ParseException e) {
+            LoggerUtils.appendErrorLog(logger, "获取最大日期(getMaxDate())出现异常：", e);
+            return null;
+        }
     }
 }
