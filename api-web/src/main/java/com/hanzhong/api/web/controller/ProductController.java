@@ -9,7 +9,6 @@ import com.hanzhong.api.web.model.bo.CompanyQryBO;
 import com.hanzhong.api.web.model.vo.CompanyInfoVO;
 import com.hanzhong.api.web.service.BusinessService;
 import com.hanzhong.api.web.util.CheckUtils;
-import com.hanzhong.api.web.util.LoggerUtils;
 import com.hanzhong.api.web.util.business.*;
 import com.hanzhong.api.web.util.business.area.AreaCodeUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -24,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
@@ -49,6 +49,14 @@ public class ProductController {
      * 分隔符-“/”
      */
     private static final String SLASH_SEPARATOR = "/";
+    /**
+     * 市辖区
+     */
+    private static final String MUNICIPAL_DISTRICT = "市辖区";
+    /**
+     * 资金单位-万
+     */
+    private static final BigDecimal CAPITAL_UNIT_W = new BigDecimal(10000);
 
     @Autowired
     private BusinessService businessService;
@@ -56,13 +64,12 @@ public class ProductController {
     /**
      * 获取企业信息
      *
-     * @param request
+     * @param request 请求
      * @return JsonResult
      */
     @PostMapping("/product_companyInfoOut")
     @ResponseBody
     public JsonResult getCompanyInfo(HttpServletRequest request) {
-        LoggerUtils.appendDebugLog(logger, "getCompanyInfo()的参数值：【{}】", request);
         // 统一社会信用代码
         String corCodeTy = request.getParameter(ProductParamEnum.COR_CODE_TY.getValue());
         // 组织机构代码
@@ -86,15 +93,16 @@ public class ProductController {
                 return JsonResultUtils.build(ResultCodeEnum.PARAM_FORMAT_ERROR, null);
             }
 
+            // 设置查询对象
+            CompanyQryBO companyQryBO = setCompanyQryBO(request, productParam);
             // 获取(在营)企业信息
-            CompanyInfoVO companyInfoVO = getCompanyInfo(request, productParam);
+            CompanyInfoVO companyInfoVO = getCompanyInfo(companyQryBO);
             if (companyInfoVO != null) {
                 return JsonResultUtils.build(ResultCodeEnum.SUCCESS, companyInfoVO);
             }
-
             return JsonResultUtils.build(ResultCodeEnum.NO_DATA, null);
         } catch (Exception e) {
-            LoggerUtils.appendErrorLog(logger, "获取企业信息(getCompanyInfo())出现异常：", e);
+            logger.error("获取企业信息出现异常：", e);
             return JsonResultUtils.build(ResultCodeEnum.FAIL, null);
         }
     }
@@ -104,7 +112,7 @@ public class ProductController {
      *
      * @param request      请求
      * @param productParam 产品参数
-     * @return boolean
+     * @return boolean true：符合
      */
     private boolean meetNotBlankRequirement(HttpServletRequest request, String productParam) {
         return StringUtils.isNotBlank(productParam) && StringUtils.isNotBlank(request.getParameter(productParam));
@@ -113,14 +121,10 @@ public class ProductController {
     /**
      * 获取(在营)企业信息
      *
-     * @param request
-     * @param productParam
+     * @param companyQryBO 企业查询参数
      * @return 若查询不到企业，则返回null
      */
-    private CompanyInfoVO getCompanyInfo(HttpServletRequest request, String productParam) {
-        // 设置查询对象
-        CompanyQryBO companyQryBO = setCompanyQryBO(request, productParam);
-
+    private CompanyInfoVO getCompanyInfo(CompanyQryBO companyQryBO) {
         List<CompanyInfoBO> companyInfoBOList = businessService.getCompanyInfoList(companyQryBO);
         if (companyInfoBOList == null || companyInfoBOList.isEmpty()) {
             return null;
@@ -139,7 +143,7 @@ public class ProductController {
     /**
      * 转换企业信息
      *
-     * @param companyInfoBO
+     * @param companyInfoBO 企业信息
      * @return CompanyInfoBO
      */
     private CompanyInfoVO convertCompanyInfo(CompanyInfoBO companyInfoBO) {
@@ -147,6 +151,11 @@ public class ProductController {
         // 复制属性值
         BeanUtils.copyProperties(companyInfoBO, companyInfoVO);
 
+        // 注册资金（数据库中的金额默认单位为万元）
+        BigDecimal regCap = companyInfoVO.getRegCap();
+        if (regCap != null) {
+            companyInfoVO.setRegCap(regCap.multiply(CAPITAL_UNIT_W).setScale(6, BigDecimal.ROUND_HALF_UP));
+        }
         String code;
         // 企业(机构)类型
         code = companyInfoVO.getEntType();
@@ -179,20 +188,18 @@ public class ProductController {
         if (StringUtils.isNotBlank(code)) {
             companyInfoVO.setEcoTecDevZone(DevZoneCodeUtils.getNameByCode(code));
         }
-
         return companyInfoVO;
     }
 
     /**
      * 设置查询对象
      *
-     * @param request
-     * @param productParam
+     * @param request      请求
+     * @param productParam 查询参数类型
      * @return CompanyQryBO
      */
     private CompanyQryBO setCompanyQryBO(HttpServletRequest request, String productParam) {
         CompanyQryBO companyQryBO = new CompanyQryBO();
-
         if (ProductParamEnum.COMPANY_NAME.getValue().equals(productParam)) {
             companyQryBO.setCompanyName(request.getParameter(productParam));
         } else if (ProductParamEnum.COR_CODE_TY.getValue().equals(productParam)) {
@@ -200,9 +207,9 @@ public class ProductController {
         } else if (ProductParamEnum.COR_CODE.getValue().equals(productParam)) {
             companyQryBO.setOrgCode(request.getParameter(productParam));
         } else {
+            logger.error("productParam的参数值【{}】不存在", productParam);
             throw new IllegalArgumentException("productParam的参数值【" + productParam + "】不存在");
         }
-
         return companyQryBO;
     }
 
@@ -214,15 +221,14 @@ public class ProductController {
      */
     private String getDomDistrictNameByCode(Integer provinceCode, Integer cityCode, Integer areaCode) {
         StringBuilder strBuilder = new StringBuilder();
-
         // 省
         String provinceName = provinceCode == null ? "" : AreaCodeUtils.getAreaNameByCode(provinceCode.toString());
         if (StringUtils.isNotEmpty(provinceName)) {
             strBuilder.append(provinceName);
         }
-        // 市
+        // 市，若为“市辖区”则不拼
         String cityName = cityCode == null ? "" : AreaCodeUtils.getAreaNameByCode(cityCode.toString());
-        if (StringUtils.isNotEmpty(cityName)) {
+        if (StringUtils.isNotEmpty(cityName) && !MUNICIPAL_DISTRICT.equals(cityName)) {
             strBuilder.append(SLASH_SEPARATOR + cityName);
         }
         // 区
@@ -230,7 +236,6 @@ public class ProductController {
         if (StringUtils.isNotEmpty(areaName)) {
             strBuilder.append(SLASH_SEPARATOR + areaName);
         }
-
         return strBuilder.toString();
     }
 
@@ -243,7 +248,7 @@ public class ProductController {
         try {
             return DateUtils.parseDate("4999-12-31", "yyyy-MM-dd");
         } catch (ParseException e) {
-            LoggerUtils.appendErrorLog(logger, "获取最大日期(getMaxDate())出现异常：", e);
+            logger.error("获取最大日期(getMaxDate())出现异常：", e);
             return null;
         }
     }

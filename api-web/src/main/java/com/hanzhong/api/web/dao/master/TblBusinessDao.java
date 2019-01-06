@@ -13,11 +13,10 @@ import java.util.List;
  *  @Version  V1.0   
  */
 public interface TblBusinessDao {
-
     /**
      * 获取企业信息
      *
-     * @param companyQryBO
+     * @param companyQryBO 企业信息查询参数
      * @return List<CompanyInfoBO>
      */
     List<CompanyInfoBO> getCompanyInfoList(CompanyQryBO companyQryBO);

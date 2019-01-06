@@ -44,7 +44,6 @@ public class ExcelUtils {
      * @throws IOException
      */
     public static Workbook readExcel(String filePath) throws IOException {
-
         if (StringUtils.isBlank(filePath)) {
             throw new IOException("文件路径为空！");
         }
@@ -52,23 +51,15 @@ public class ExcelUtils {
         Workbook wb;
         // 文件拓展名
         String extString = filePath.substring(filePath.lastIndexOf(DOT_SEPARATOR));
-        InputStream inputStream = ExcelUtils.class.getClassLoader().getResourceAsStream(filePath);
-
-        try {
+        try (
+                InputStream inputStream = ExcelUtils.class.getClassLoader().getResourceAsStream(filePath)
+        ) {
             if (EXTENSION_XLS.equals(extString)) {
                 wb = new HSSFWorkbook(inputStream);
             } else if (EXTENSION_XLSX.equals(extString)) {
                 wb = new XSSFWorkbook(inputStream);
             } else {
                 throw new IOException("文件【" + filePath + "】非excel文件");
-            }
-
-            // 关闭输入流
-            inputStream.close();
-        } finally {
-            if (inputStream != null) {
-                // 关闭输入流
-                inputStream.close();
             }
         }
 
@@ -82,14 +73,12 @@ public class ExcelUtils {
      * @return String 若cell为null,则返回null
      */
     public static String getStringValue(Cell cell) {
-
         if (cell == null) {
             return null;
         }
 
         String strValue;
         CellType cellType = cell.getCellTypeEnum();
-
         if (CellType.STRING.equals(cellType)) {
             strValue = cell.getStringCellValue();
         } else if (CellType.NUMERIC.equals(cellType)) {
@@ -97,7 +86,6 @@ public class ExcelUtils {
         } else {
             strValue = "";
         }
-
         return strValue;
     }
 
@@ -108,7 +96,6 @@ public class ExcelUtils {
      * @return String 若cell为null,则返回null
      */
     public static Double getNumericValue(Cell cell) {
-
         if (cell == null) {
             return null;
         }
@@ -122,7 +109,6 @@ public class ExcelUtils {
         } else {
             numValue = null;
         }
-
         return numValue;
     }
 }

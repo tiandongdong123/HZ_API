@@ -3,7 +3,6 @@ package com.hanzhong.api.web.util.business;
 import com.hanzhong.api.web.constant.cmnenum.LoggerEnum;
 import com.hanzhong.api.web.util.CheckUtils;
 import com.hanzhong.api.web.util.ExcelUtils;
-import com.hanzhong.api.web.util.LoggerUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -21,7 +20,7 @@ import java.util.Map;
  */
 public class CommonUtils {
 
-    private static final Logger logger = LoggerFactory.getLogger(LoggerEnum.ABNORMAL_CODE_DATA.getValue());
+    private static final Logger abnormalCodeDataLogger = LoggerFactory.getLogger(LoggerEnum.ABNORMAL_CODE_DATA.getValue());
 
     private CommonUtils() {
     }
@@ -143,13 +142,13 @@ public class CommonUtils {
 
                 // 判断code是否已存在
                 if (codeMap.containsKey(code)) {
-                    LoggerUtils.appendWarnLog(logger, "文件：【{}】，sheet：【{}】，行号：【{}】，代码【{}】已存在！", filePath, sheetName, i + 1, code);
+                    abnormalCodeDataLogger.warn("文件：【{}】，sheet：【{}】，行号：【{}】，代码【{}】已存在！", filePath, sheetName, i + 1, code);
                     continue;
                 }
 
                 // 判断name是否为空
                 if (StringUtils.isEmpty(name)) {
-                    LoggerUtils.appendWarnLog(logger, "文件：【{}】，sheet：【{}】，行号：【{}】，代码【{}】对应的值为空！", filePath, sheetName, i + 1, code);
+                    abnormalCodeDataLogger.warn("文件：【{}】，sheet：【{}】，行号：【{}】，代码【{}】对应的值为空！", filePath, sheetName, i + 1, code);
                 }
 
                 codeMap.put(code, name);

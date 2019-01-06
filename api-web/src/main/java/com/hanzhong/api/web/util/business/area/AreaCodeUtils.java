@@ -1,11 +1,10 @@
 package com.hanzhong.api.web.util.business.area;
 
 import com.hanzhong.api.web.constant.cmnenum.LoggerEnum;
-import com.hanzhong.api.web.util.LoggerUtils;
 import com.hanzhong.api.web.util.PropertiesUtils;
 import com.hanzhong.api.web.util.business.CommonUtils;
-import com.hanzhong.api.web.util.business.area.model.AreaInfo;
 import com.hanzhong.api.web.util.business.area.model.AreaCode;
+import com.hanzhong.api.web.util.business.area.model.AreaInfo;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -170,7 +169,7 @@ public class AreaCodeUtils {
         try {
             codeMap = CommonUtils.cacheCodeMapExcludeChineseRow(AREA_CODE_FILE_PATH, AREA_CODE_FILE_SHEET_NAME);
         } catch (IOException e) {
-            LoggerUtils.appendErrorLog(logger, "文件：【{}】，sheet：【{}】,缓存代码(cacheCodeMap())出现异常：", AREA_CODE_FILE_PATH, AREA_CODE_FILE_SHEET_NAME, e);
+            logger.error("文件：【{}】，sheet：【{}】,缓存代码(cacheCodeMap())出现异常：", AREA_CODE_FILE_PATH, AREA_CODE_FILE_SHEET_NAME, e);
         }
     }
 

@@ -22,9 +22,21 @@ public class CompanyInfoVO implements Serializable {
      */
     private String pripId;
     /**
+     * 统一社会信用代码
+     */
+    private String usCreditCode;
+    /**
+     * 组织结构代码
+     */
+    private String orgCode;
+    /**
      * 企业(机构)名称
      */
     private String entName;
+    /**
+     * 所属行业
+     */
+    private String industry;
     /**
      * 注册资金
      */
@@ -102,12 +114,36 @@ public class CompanyInfoVO implements Serializable {
         this.pripId = pripId;
     }
 
+    public String getUsCreditCode() {
+        return usCreditCode;
+    }
+
+    public void setUsCreditCode(String usCreditCode) {
+        this.usCreditCode = usCreditCode;
+    }
+
+    public String getOrgCode() {
+        return orgCode;
+    }
+
+    public void setOrgCode(String orgCode) {
+        this.orgCode = orgCode;
+    }
+
     public String getEntName() {
         return entName;
     }
 
     public void setEntName(String entName) {
         this.entName = entName;
+    }
+
+    public String getIndustry() {
+        return industry;
+    }
+
+    public void setIndustry(String industry) {
+        this.industry = industry;
     }
 
     public BigDecimal getRegCap() {
@@ -252,9 +288,12 @@ public class CompanyInfoVO implements Serializable {
 
     @Override
     public String toString() {
-        return "CompanyInfoBO{" +
+        return "CompanyInfoVO{" +
                 "pripId='" + pripId + '\'' +
+                ", usCreditCode='" + usCreditCode + '\'' +
+                ", orgCode='" + orgCode + '\'' +
                 ", entName='" + entName + '\'' +
+                ", industry='" + industry + '\'' +
                 ", regCap=" + regCap +
                 ", regCapCur='" + regCapCur + '\'' +
                 ", entType='" + entType + '\'' +

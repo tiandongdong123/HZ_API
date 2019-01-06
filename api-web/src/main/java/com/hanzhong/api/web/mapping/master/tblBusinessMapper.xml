@@ -3,7 +3,10 @@
 <mapper namespace="com.hanzhong.api.web.dao.master.TblBusinessDao">
     <resultMap id="CompanyInfoMap" type="com.hanzhong.api.web.model.bo.CompanyInfoBO">
         <result column="PRIPID" property="pripId" jdbcType="VARCHAR"/>
+        <result column="CREDITCODE" property="usCreditCode" jdbcType="VARCHAR"/>
+        <result column="ORGCODE" property="orgCode" jdbcType="VARCHAR"/>
         <result column="ENTNAME" property="entName" jdbcType="VARCHAR"/>
+        <result column="INDUSTRY" property="industry" jdbcType="VARCHAR"/>
         <result column="REGCAP" property="regCap" jdbcType="DECIMAL"/>
         <result column="REGCAPCUR" property="regCapCur" jdbcType="VARCHAR"/>
         <result column="ENTTYPE" property="entType" jdbcType="VARCHAR"/>
@@ -30,8 +33,8 @@
     <select id="getCompanyInfoList" parameterType="com.hanzhong.api.web.model.bo.CompanyQryBO"
             resultMap="CompanyInfoMap">
         SELECT
-        PRIPID, ENTNAME,REGCAP,REGCAPCUR,ENTTYPE,S_EXT_ENTPROPERTY,ENTSTATUS,OPSCOPE, ESDATE,APPRDATE,OPFROM,OPTO,NAME,
-        REGORG,DOM,OPLOC,POSTALCODE,DOMDISTRICT,ECOTECDEVZONE,PROVINCE,CITY,AREA
+        PRIPID, CREDITCODE,ORGCODE,ENTNAME,REGCAP,REGCAPCUR,ENTTYPE,S_EXT_ENTPROPERTY,ENTSTATUS,OPSCOPE, ESDATE,
+        APPRDATE,OPFROM,OPTO,NAME,REGORG,DOM,OPLOC,POSTALCODE,DOMDISTRICT,ECOTECDEVZONE,PROVINCE,CITY,AREA
         FROM tblBusiness
         <where>
             <if test="companyName != null and companyName != ''">

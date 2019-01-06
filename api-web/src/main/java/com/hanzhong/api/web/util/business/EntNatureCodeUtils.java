@@ -1,7 +1,6 @@
 package com.hanzhong.api.web.util.business;
 
 import com.hanzhong.api.web.constant.cmnenum.LoggerEnum;
-import com.hanzhong.api.web.util.LoggerUtils;
 import com.hanzhong.api.web.util.PropertiesUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +56,7 @@ public class EntNatureCodeUtils {
         try {
             codeMap = CommonUtils.cacheCodeMapExcludeChineseRow(ENT_NATURE_CODE_FILE_PATH, ENT_NATURE_CODE_FILE_SHEET_NAME);
         } catch (IOException e) {
-            LoggerUtils.appendErrorLog(logger, "文件：【{}】，sheet：【{}】,缓存代码(cacheCodeMap())出现异常：", ENT_NATURE_CODE_FILE_PATH, ENT_NATURE_CODE_FILE_SHEET_NAME, e);
+            logger.error( "文件：【{}】，sheet：【{}】,缓存代码(cacheCodeMap())出现异常：", ENT_NATURE_CODE_FILE_PATH, ENT_NATURE_CODE_FILE_SHEET_NAME, e);
         }
     }
 

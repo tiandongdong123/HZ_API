@@ -4,9 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.hanzhong.api.web.constant.cmnenum.LoggerEnum;
 import com.hanzhong.api.web.constant.cmnenum.ResultCodeEnum;
 import com.hanzhong.api.web.util.IpUtils;
-import com.hanzhong.api.web.util.LoggerUtils;
-import com.hanzhong.api.web.util.business.AuthUtils;
 import com.hanzhong.api.web.util.business.JsonResultUtils;
+import com.hanzhong.api.web.util.business.auth.IpAuthUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -27,18 +26,18 @@ import java.io.PrintWriter;
 @Component
 public class AuthInterceptor extends HandlerInterceptorAdapter {
 
-    private static final Logger ipVisitlogger = LoggerFactory.getLogger(LoggerEnum.IP_VISIT.getValue());
+    private static final Logger ipVisitLogger = LoggerFactory.getLogger(LoggerEnum.IP_VISIT.getValue());
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         // ip
         String ip = IpUtils.getIp(request);
 
-        if (AuthUtils.isAuthIp(ip)) {
-            LoggerUtils.appendInfoLog(ipVisitlogger, "ip：【{}】正常访问", ip);
+        if (IpAuthUtils.isAuthIp(ip)) {
+            ipVisitLogger.info("ip：【{}】正常访问", ip);
             return true;
         } else {
-            LoggerUtils.appendWarnLog(ipVisitlogger, "ip：【{}】不在ip白名单内，拒绝访问", ip);
+            ipVisitLogger.warn("ip：【{}】不在ip白名单内，拒绝访问", ip);
             response.setContentType("text/plain;charset=UTF-8");
             response.setCharacterEncoding("UTF-8");
             PrintWriter printWriter = response.getWriter();

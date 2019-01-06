@@ -1,11 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration debug="false">
     <!--格式化输出：%-5level：级别从左显示5个字符宽度，%d表示日期，%thread表示线程名，%msg：日志消息，%n是换行符-->
-    <property name="LOG_PATTERN" value="%-5level [%d{yyyy-MM-dd HH:mm:ss.SSS}] [%thread] %logger{50}.%method:%line - %msg%n"/>
+    <property name="LOG_PATTERN"
+              value="%-5level [%d{yyyy-MM-dd HH:mm:ss.SSS}] [%thread] %logger{50}.%method:%line - %msg%n"/>
     <!--定义日志文件的存储地址 勿在 LogBack 的配置中使用相对路径-->
     <property name="LOG_HOME" value="logs/api-web"/>
     <!--定义应用名称-->
     <property name="APP_NAME" value="apiWeb"/>
+    <!--定义日志类型-运行-->
+    <property name="LOG_TYPE_RUN" value="run"/>
+    <!--定义日志类型-访问-->
+    <property name="LOG_TYPE_VISIT" value="visit"/>
+    <!--定义日志类型-监控-->
+    <property name="LOG_TYPE_MONITOR" value="monitor"/>
     <!--定义日志文件保留时间-->
     <property name="MAX_HISTORY" value="15"/>
 
@@ -28,7 +35,7 @@
         <!--滚动策略-->
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <!--日志文件输出的文件名-->
-            <fileNamePattern>${LOG_HOME}/debug/${APP_NAME}_debug_%d{yyyy-MM-dd}_%i.log</fileNamePattern>
+            <fileNamePattern>${LOG_HOME}/debug/${APP_NAME}_${LOG_TYPE_RUN}_debug_%d{yyyy-MM-dd}_%i.log</fileNamePattern>
             <!--日志文件保留时间，时间单位与fileNamePattern中%d{}的设置一致-->
             <MaxHistory>${MAX_HISTORY}</MaxHistory>
             <!--单文件最大的存储-->
@@ -54,7 +61,7 @@
         <!--滚动策略-->
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <!--日志文件输出的文件名-->
-            <fileNamePattern>${LOG_HOME}/info/${APP_NAME}_info_%d{yyyy-MM-dd}_%i.log</fileNamePattern>
+            <fileNamePattern>${LOG_HOME}/info/${APP_NAME}_${LOG_TYPE_RUN}_info_%d{yyyy-MM-dd}_%i.log</fileNamePattern>
             <!--日志文件保留时间，时间单位与fileNamePattern中%d{}的设置一致-->
             <MaxHistory>${MAX_HISTORY}</MaxHistory>
             <!--单文件最大的存储-->
@@ -80,7 +87,7 @@
         <!--滚动策略-->
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <!--日志文件输出的文件名-->
-            <fileNamePattern>${LOG_HOME}/warn/${APP_NAME}_warn_%d{yyyy-MM-dd}_%i.log</fileNamePattern>
+            <fileNamePattern>${LOG_HOME}/warn/${APP_NAME}_${LOG_TYPE_RUN}_warn_%d{yyyy-MM-dd}_%i.log</fileNamePattern>
             <!--日志文件保留时间，时间单位与fileNamePattern中%d{}的设置一致-->
             <MaxHistory>${MAX_HISTORY}</MaxHistory>
             <!--单文件最大的存储-->
@@ -106,7 +113,7 @@
         <!--滚动策略-->
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <!--日志文件输出的文件名-->
-            <fileNamePattern>${LOG_HOME}/error/${APP_NAME}_error_%d{yyyy-MM-dd}_%i.log</fileNamePattern>
+            <fileNamePattern>${LOG_HOME}/error/${APP_NAME}_${LOG_TYPE_RUN}_error_%d{yyyy-MM-dd}_%i.log</fileNamePattern>
             <!--日志文件保留时间，时间单位与fileNamePattern中%d{}的设置一致-->
             <MaxHistory>${MAX_HISTORY}</MaxHistory>
             <!--单文件最大的存储-->
@@ -127,7 +134,7 @@
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <!--日志文件输出的文件名-->
             <fileNamePattern>
-                ${LOG_HOME}/abnormalData/${APP_NAME}_abnormalData_abnormalCodeData_%d{yyyy-MM-dd}_%i.log
+                ${LOG_HOME}/abnormalData/${APP_NAME}_${LOG_TYPE_MONITOR}_abnormalCodeData_%d{yyyy-MM-dd}_%i.log
             </fileNamePattern>
             <!--日志文件保留时间，时间单位与fileNamePattern中%d{}的设置一致-->
             <MaxHistory>${MAX_HISTORY}</MaxHistory>
@@ -148,7 +155,29 @@
         <!--滚动策略-->
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <!--日志文件输出的文件名-->
-            <fileNamePattern>${LOG_HOME}/visit/${APP_NAME}_visit_ipVisit_%d{yyyy-MM-dd}_%i.log
+            <fileNamePattern>${LOG_HOME}/visit/${APP_NAME}_${LOG_TYPE_VISIT}_ipVisit_%d{yyyy-MM-dd}_%i.log
+            </fileNamePattern>
+            <!--日志文件保留时间，时间单位与fileNamePattern中%d{}的设置一致-->
+            <MaxHistory>${MAX_HISTORY}</MaxHistory>
+            <!--单文件最大的存储-->
+            <MaxFileSize>64MB</MaxFileSize>
+        </rollingPolicy>
+        <!--编码器-->
+        <encoder>
+            <!--格式化输出-->
+            <pattern>${LOG_PATTERN}</pattern>
+            <!--日志编码-->
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- 滚动生成日志文件_task日志 -->
+    <appender name="taskFileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!--滚动策略-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!--日志文件输出的文件名-->
+            <fileNamePattern>
+                ${LOG_HOME}/task/${APP_NAME}_${LOG_TYPE_MONITOR}_task_%d{yyyy-MM-dd}_%i.log
             </fileNamePattern>
             <!--日志文件保留时间，时间单位与fileNamePattern中%d{}的设置一致-->
             <MaxHistory>${MAX_HISTORY}</MaxHistory>
@@ -178,9 +207,13 @@
     <logger name="abnormalCodeDataLogger" level="INFO" additivity="false">
         <appender-ref ref="abnormalCodeDataFileAppender"/>
     </logger>
-    <!--jp访问日志-->
+    <!--ip访问日志-->
     <logger name="ipVisitLogger" level="INFO" additivity="false">
         <appender-ref ref="ipVisitFileAppender"/>
+    </logger>
+    <!--task日志-->
+    <logger name="com.hanzhong.api.web.task" level="INFO" additivity="false">
+        <appender-ref ref="taskFileAppender"/>
     </logger>
 
     <!-- 日志输出级别 -->

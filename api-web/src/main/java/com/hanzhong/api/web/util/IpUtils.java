@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletRequest;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.regex.Pattern;
 
 /**
  *    
@@ -21,6 +22,7 @@ public class IpUtils {
     private static final String UNKNOWN = "unknown";
     private static final String HOST_127 = "127.0.0.1";
     private static final String HOST_BASE = "0:0:0:0:0:0:0:1";
+    private static final Pattern IP_PATTERN = Pattern.compile("^(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|[1-9])\\.(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|\\d)\\.(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|\\d)\\.(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|\\d)$");
 
     private IpUtils() {
     }
@@ -82,5 +84,15 @@ public class IpUtils {
             }
         }
         return ip;
+    }
+
+    /**
+     * 检测ip格式
+     *
+     * @param ip ip
+     * @return true: 符合ip格式
+     */
+    public static boolean checkIpFormat(String ip) {
+        return IP_PATTERN.matcher(ip).matches();
     }
 }
