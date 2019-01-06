@@ -42,7 +42,7 @@ public class PropertiesUtils {
         try {
             propertyValue = getValue(prop, DEFAULT_PROPERTIES_FILE_PATH, key);
         } catch (IOException ioe) {
-            logger.error("加载【{}】出现异常：", DEFAULT_PROPERTIES_FILE_PATH, ioe);
+            logger.error("key：【{}】，加载【{}】出现异常：", key, DEFAULT_PROPERTIES_FILE_PATH, ioe);
         }
 
         return propertyValue;
@@ -64,7 +64,7 @@ public class PropertiesUtils {
                 propertyValue = defaultValue;
             }
         } catch (IOException ioe) {
-            logger.error("加载【{}】出现异常：", DEFAULT_PROPERTIES_FILE_PATH, ioe);
+            logger.error("key：【{}】，defaultValue：【{}】，加载【{}】出现异常：", key, defaultValue, DEFAULT_PROPERTIES_FILE_PATH, ioe);
         }
 
         return propertyValue;
