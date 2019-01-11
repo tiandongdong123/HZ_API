@@ -8,7 +8,6 @@ package com.hanzhong.api.web.model.bo;
  *  @Version  V1.0   
  */
 public class CompanyQryBO {
-
     /**
      * 公司名称
      */

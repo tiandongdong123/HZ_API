@@ -18,10 +18,6 @@ public class CompanyInfoVO implements Serializable {
     private static final long serialVersionUID = -4963266899668807475L;
 
     /**
-     * 主体身份代码
-     */
-    private String pripId;
-    /**
      * 统一社会信用代码
      */
     private String usCreditCode;
@@ -50,10 +46,6 @@ public class CompanyInfoVO implements Serializable {
      */
     private String entType;
     /**
-     * 企业性质
-     */
-    private String sExtEntProperty;
-    /**
      * 企业状态
      */
     private String entStatus;
@@ -62,21 +54,21 @@ public class CompanyInfoVO implements Serializable {
      */
     private String opScope;
     /**
-     * 成立日期
+     * 成立日期(格式：yyyy-MM-dd)
      */
-    private Date esDate;
+    private String esDate;
     /**
-     * 核准日期
+     * 核准日期(格式：yyyy-MM-dd)
      */
-    private Date apprDate;
+    private String apprDate;
     /**
-     * 经营(驻在)期限自
+     * 经营(驻在)期限自(格式：yyyy-MM-dd)
      */
-    private Date opFrom;
+    private String opFrom;
     /**
-     * 经营(驻在)期限至
+     * 经营(驻在)期限至(格式：yyyy-MM-dd)
      */
-    private Date opTo;
+    private String opTo;
     /**
      * 法定代表人
      */
@@ -90,10 +82,6 @@ public class CompanyInfoVO implements Serializable {
      */
     private String dom;
     /**
-     * 经营场所
-     */
-    private String opLoc;
-    /**
      * 邮政编码
      */
     private String postalCode;
@@ -105,14 +93,6 @@ public class CompanyInfoVO implements Serializable {
      * 住所所在经济开发区
      */
     private String ecoTecDevZone;
-
-    public String getPripId() {
-        return pripId;
-    }
-
-    public void setPripId(String pripId) {
-        this.pripId = pripId;
-    }
 
     public String getUsCreditCode() {
         return usCreditCode;
@@ -170,14 +150,6 @@ public class CompanyInfoVO implements Serializable {
         this.entType = entType;
     }
 
-    public String getsExtEntProperty() {
-        return sExtEntProperty;
-    }
-
-    public void setsExtEntProperty(String sExtEntProperty) {
-        this.sExtEntProperty = sExtEntProperty;
-    }
-
     public String getEntStatus() {
         return entStatus;
     }
@@ -194,39 +166,35 @@ public class CompanyInfoVO implements Serializable {
         this.opScope = opScope;
     }
 
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
-    public Date getEsDate() {
+    public String getEsDate() {
         return esDate;
     }
 
-    public void setEsDate(Date esDate) {
+    public void setEsDate(String esDate) {
         this.esDate = esDate;
     }
 
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
-    public Date getApprDate() {
+    public String getApprDate() {
         return apprDate;
     }
 
-    public void setApprDate(Date apprDate) {
+    public void setApprDate(String apprDate) {
         this.apprDate = apprDate;
     }
 
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
-    public Date getOpFrom() {
+    public String getOpFrom() {
         return opFrom;
     }
 
-    public void setOpFrom(Date opFrom) {
+    public void setOpFrom(String opFrom) {
         this.opFrom = opFrom;
     }
 
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
-    public Date getOpTo() {
+    public String getOpTo() {
         return opTo;
     }
 
-    public void setOpTo(Date opTo) {
+    public void setOpTo(String opTo) {
         this.opTo = opTo;
     }
 
@@ -252,14 +220,6 @@ public class CompanyInfoVO implements Serializable {
 
     public void setDom(String dom) {
         this.dom = dom;
-    }
-
-    public String getOpLoc() {
-        return opLoc;
-    }
-
-    public void setOpLoc(String opLoc) {
-        this.opLoc = opLoc;
     }
 
     public String getPostalCode() {
@@ -289,15 +249,13 @@ public class CompanyInfoVO implements Serializable {
     @Override
     public String toString() {
         return "CompanyInfoVO{" +
-                "pripId='" + pripId + '\'' +
-                ", usCreditCode='" + usCreditCode + '\'' +
+                "usCreditCode='" + usCreditCode + '\'' +
                 ", orgCode='" + orgCode + '\'' +
                 ", entName='" + entName + '\'' +
                 ", industry='" + industry + '\'' +
                 ", regCap=" + regCap +
                 ", regCapCur='" + regCapCur + '\'' +
                 ", entType='" + entType + '\'' +
-                ", sExtEntProperty='" + sExtEntProperty + '\'' +
                 ", entStatus='" + entStatus + '\'' +
                 ", opScope='" + opScope + '\'' +
                 ", esDate=" + esDate +
@@ -307,7 +265,6 @@ public class CompanyInfoVO implements Serializable {
                 ", name='" + name + '\'' +
                 ", regOrg='" + regOrg + '\'' +
                 ", dom='" + dom + '\'' +
-                ", opLoc='" + opLoc + '\'' +
                 ", postalCode='" + postalCode + '\'' +
                 ", domDistrict='" + domDistrict + '\'' +
                 ", ecoTecDevZone='" + ecoTecDevZone + '\'' +

@@ -79,6 +79,16 @@
             </exclusions>
         </dependency>
         <!--数据库相关 end-->
+
+        <!--龙盾相关-->
+        <dependency>
+            <groupId>com.quantum</groupId>
+            <artifactId>quantum-auth</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>lite</groupId>
+            <artifactId>jsel</artifactId>
+        </dependency>
     </dependencies>
 
     <!--多环境配置-->

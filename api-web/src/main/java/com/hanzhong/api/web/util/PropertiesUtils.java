@@ -17,7 +17,7 @@ public class PropertiesUtils {
     private static final Logger logger = LoggerFactory.getLogger(PropertiesUtils.class);
 
     private static Properties prop = new Properties();
-    private static final String DEFAULT_PROPERTIES_FILE_PATH = "dev/init.properties";
+    private static final String DEFAULT_PROPERTIES_FILE_PATH = "init.properties";
 
     static {
         try {

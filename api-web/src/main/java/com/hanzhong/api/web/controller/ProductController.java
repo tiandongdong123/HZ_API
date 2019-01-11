@@ -9,10 +9,15 @@ import com.hanzhong.api.web.model.bo.CompanyQryBO;
 import com.hanzhong.api.web.model.vo.CompanyInfoVO;
 import com.hanzhong.api.web.service.BusinessService;
 import com.hanzhong.api.web.util.CheckUtils;
-import com.hanzhong.api.web.util.business.*;
+import com.hanzhong.api.web.util.business.AdminCodeUtils;
+import com.hanzhong.api.web.util.business.DevZoneCodeUtils;
+import com.hanzhong.api.web.util.business.EntTypeCodeUtils;
+import com.hanzhong.api.web.util.business.JsonResultUtils;
 import com.hanzhong.api.web.util.business.area.AreaCodeUtils;
+import com.hanzhong.api.web.util.business.longdun.LdApiUtils;
+import com.hanzhong.api.web.util.business.longdun.constant.KeyWordTypeEnum;
+import com.hanzhong.api.web.util.business.longdun.model.*;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -24,8 +29,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
-import java.text.ParseException;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -53,10 +56,6 @@ public class ProductController {
      * 市辖区
      */
     private static final String MUNICIPAL_DISTRICT = "市辖区";
-    /**
-     * 资金单位-万
-     */
-    private static final BigDecimal CAPITAL_UNIT_W = new BigDecimal(10000);
 
     @Autowired
     private BusinessService businessService;
@@ -125,28 +124,79 @@ public class ProductController {
      * @return 若查询不到企业，则返回null
      */
     private CompanyInfoVO getCompanyInfo(CompanyQryBO companyQryBO) {
+        // 获取企业信息
         List<CompanyInfoBO> companyInfoBOList = businessService.getCompanyInfoList(companyQryBO);
+
+        CompanyInfoBO companyInfoBO = new CompanyInfoBO();
+        boolean doingBusinessFlag = false;
+        // 若有多个查询结果，则优先返回“在营”企业信息
+        for (CompanyInfoBO infoBO : companyInfoBOList) {
+            if (EntStatusEnum.DOING_BUSINESS.getKey().equals(companyInfoBO.getEntStatus())) {
+                doingBusinessFlag = true;
+                companyInfoBO = infoBO;
+            }
+        }
+        if (!companyInfoBOList.isEmpty() && !doingBusinessFlag) {
+            companyInfoBO = companyInfoBOList.get(0);
+        }
+
+        // 通过企业名称查询
+        String companyName = companyQryBO.getCompanyName();
+        if (StringUtils.isNotBlank(companyName)) {
+            RegisterInfoQryParam infoQryParam = new RegisterInfoQryParam();
+            infoQryParam.setEntName(companyName);
+            RegisterInfo registerInfo = getRegisterInfo(infoQryParam);
+            if (registerInfo == null) {
+                logger.warn("第三方通过企业名称【{}】查询未查询到企业信息", companyName);
+                return null;
+            }
+            return mergeCompanyInfo(companyInfoBO, registerInfo);
+        }
+
+        // 通过统一社会信用代码
+        String usCreditCode = companyQryBO.getUsCreditCode();
+        if (StringUtils.isNotBlank(usCreditCode)) {
+            EntKeyWordQryParam keyWordQryParam = new EntKeyWordQryParam();
+            keyWordQryParam.setKeyword(companyQryBO.getUsCreditCode());
+            keyWordQryParam.setKeyWordTypeEnum(KeyWordTypeEnum.REG_NUM_OR_USCC_NUM);
+            EntInfo entInfo = getUniqueEntInfo(keyWordQryParam);
+            if (entInfo == null) {
+                logger.warn("第三方通过统一社会信用代码【{}】查询未查询到企业信息", usCreditCode);
+                return null;
+            }
+            RegisterInfoQryParam infoQryParam = new RegisterInfoQryParam();
+            infoQryParam.setEntName(entInfo.getEntName());
+            RegisterInfo registerInfo = getRegisterInfo(infoQryParam);
+            if (registerInfo == null) {
+                return null;
+            }
+            return mergeCompanyInfo(companyInfoBO, registerInfo);
+        }
+
+        // 通过组织结构代码查询
+        String orgCode = companyQryBO.getOrgCode();
         if (companyInfoBOList == null || companyInfoBOList.isEmpty()) {
+            logger.info("通过组织结构代码【{}】查询的企业信息为空！", orgCode);
             return null;
         }
 
-        // 若有多个查询结果，则优先返回“在营”企业信息
-        for (CompanyInfoBO companyInfoBO : companyInfoBOList) {
-            if (EntStatusEnum.DOING_BUSINESS.getKey().equals(companyInfoBO.getEntStatus())) {
-                return convertCompanyInfo(companyInfoBO);
-            }
+        RegisterInfoQryParam infoQryParam = new RegisterInfoQryParam();
+        infoQryParam.setEntName(companyInfoBO.getEntName());
+        RegisterInfo registerInfo = getRegisterInfo(infoQryParam);
+        if (registerInfo == null) {
+            logger.info("通过组织结构代码【{}】查询企业名称为【{}】的企业信息为空！", orgCode, companyInfoBO.getEntName());
+            return null;
         }
-
-        return convertCompanyInfo(companyInfoBOList.get(0));
+        return mergeCompanyInfo(companyInfoBO, registerInfo);
     }
 
     /**
      * 转换企业信息
      *
      * @param companyInfoBO 企业信息
-     * @return CompanyInfoBO
+     * @return CompanyInfoVO
      */
-    private CompanyInfoVO convertCompanyInfo(CompanyInfoBO companyInfoBO) {
+    private CompanyInfoVO convertToCompanyInfoVO(CompanyInfoBO companyInfoBO) {
         CompanyInfoVO companyInfoVO = new CompanyInfoVO();
         // 复制属性值
         BeanUtils.copyProperties(companyInfoBO, companyInfoVO);
@@ -154,18 +204,13 @@ public class ProductController {
         // 注册资金（数据库中的金额默认单位为万元）
         BigDecimal regCap = companyInfoVO.getRegCap();
         if (regCap != null) {
-            companyInfoVO.setRegCap(regCap.multiply(CAPITAL_UNIT_W).setScale(6, BigDecimal.ROUND_HALF_UP));
+            companyInfoVO.setRegCap(regCap.setScale(6, BigDecimal.ROUND_HALF_UP));
         }
         String code;
         // 企业(机构)类型
         code = companyInfoVO.getEntType();
         if (StringUtils.isNotBlank(code)) {
             companyInfoVO.setEntType(EntTypeCodeUtils.getNameByCode(code));
-        }
-        // 企业性质
-        code = companyInfoVO.getsExtEntProperty();
-        if (StringUtils.isNotBlank(code)) {
-            companyInfoVO.setsExtEntProperty(EntNatureCodeUtils.getNameByCode(code));
         }
         // 企业状态
         code = companyInfoVO.getEntStatus();
@@ -174,7 +219,7 @@ public class ProductController {
         }
         // 经营(驻在)期限至
         if (companyInfoVO.getOpFrom() != null && companyInfoVO.getOpTo() == null) {
-            companyInfoVO.setOpTo(getMaxDate());
+            companyInfoVO.setOpTo("4999-12-31");
         }
         // 登记机关
         code = companyInfoVO.getRegOrg();
@@ -240,16 +285,86 @@ public class ProductController {
     }
 
     /**
-     * 获取最大日期（4999-12-31）
+     * 获取唯一的企业
      *
-     * @return Date 若异常，则返回null
+     * @param keyWordQryParam 企业列表信息查询参数
+     * @return EntInfo
      */
-    private Date getMaxDate() {
-        try {
-            return DateUtils.parseDate("4999-12-31", "yyyy-MM-dd");
-        } catch (ParseException e) {
-            logger.error("获取最大日期(getMaxDate())出现异常：", e);
+    private EntInfo getUniqueEntInfo(EntKeyWordQryParam keyWordQryParam) {
+        // 根据关键字获取企业列表信息
+        ApiResult apiResult = LdApiUtils.getEntApiResultByKeyword(keyWordQryParam);
+        if (apiResult == null) {
             return null;
         }
+
+        // 判断结果数据是否为空
+        List<EntInfo> entInfoList = (List<EntInfo>) apiResult.getResultData();
+        if (entInfoList == null || entInfoList.isEmpty()) {
+            return null;
+        }
+
+        if (KeyWordTypeEnum.ENT_NAME.equals(keyWordQryParam.getKeyWordTypeEnum())) {
+            for (EntInfo entInfo : entInfoList) {
+                if (entInfo.getEntName().equals(keyWordQryParam.getKeyword())) {
+                    return entInfo;
+                }
+            }
+        } else if (KeyWordTypeEnum.REG_NUM_OR_USCC_NUM.equals(keyWordQryParam.getKeyWordTypeEnum())) {
+            return entInfoList.get(0);
+        }
+        return null;
+    }
+
+    /**
+     * 获取企业基本信息
+     *
+     * @param infoQryParam 企业基本信息查询参数
+     * @return RegisterInfo
+     */
+    private RegisterInfo getRegisterInfo(RegisterInfoQryParam infoQryParam) {
+        // 获取企业登记信息
+        ApiResult apiResult = LdApiUtils.getRegisterInfoApiResult(infoQryParam);
+        if (apiResult == null) {
+            return null;
+        }
+
+        // 判断结果数据是否为空
+        List<RegisterInfo> registerInfoList = (List<RegisterInfo>) apiResult.getResultData();
+        if (registerInfoList == null || registerInfoList.isEmpty()) {
+            return null;
+        }
+
+        return registerInfoList.get(0);
+    }
+
+    /**
+     * 合并企业结果信息
+     *
+     * @param companyInfoBO 本地库企业信息
+     * @param registerInfo  第三方提供企业信息
+     * @return CompanyInfoVO
+     */
+    private CompanyInfoVO mergeCompanyInfo(CompanyInfoBO companyInfoBO, RegisterInfo registerInfo) {
+        CompanyInfoVO companyInfoVO = new CompanyInfoVO();
+        companyInfoVO.setUsCreditCode(CheckUtils.isUnifiedSocialCreditCode(registerInfo.getShxydm()) ? registerInfo.getShxydm() : "");
+        companyInfoVO.setOrgCode(CheckUtils.isOrganizationCode(registerInfo.getOrgId()) ? registerInfo.getOrgId() : "");
+        companyInfoVO.setEntName(registerInfo.getEntName());
+        companyInfoVO.setIndustry(registerInfo.getIndustry());
+        companyInfoVO.setRegCap(StringUtils.isBlank(registerInfo.getRegCap()) ? null : new BigDecimal(registerInfo.getRegCap()));
+        companyInfoVO.setRegCapCur(registerInfo.getRegCapCur());
+        companyInfoVO.setEntType(registerInfo.getEntType());
+        companyInfoVO.setEntStatus(registerInfo.getEntStatus());
+        companyInfoVO.setOpScope(registerInfo.getOpScope());
+        companyInfoVO.setEsDate(registerInfo.getEsDate());
+        companyInfoVO.setApprDate(registerInfo.getApprDate());
+        companyInfoVO.setOpFrom(registerInfo.getOpFrom());
+        companyInfoVO.setOpTo(StringUtils.isBlank(registerInfo.getOpTo()) || "长期".equals(registerInfo.getOpTo()) ? "4999-12-31" : registerInfo.getOpTo());
+        companyInfoVO.setName(registerInfo.getFrdb());
+        companyInfoVO.setRegOrg(registerInfo.getRegOrg());
+        companyInfoVO.setDom(registerInfo.getDom());
+        companyInfoVO.setPostalCode(companyInfoBO.getPostalCode());
+        companyInfoVO.setDomDistrict(getDomDistrictNameByCode(companyInfoBO.getProvince(), companyInfoBO.getCity(), companyInfoBO.getArea()));
+        companyInfoVO.setEcoTecDevZone(DevZoneCodeUtils.getNameByCode(companyInfoBO.getEcoTecDevZone()));
+        return companyInfoVO;
     }
 }
