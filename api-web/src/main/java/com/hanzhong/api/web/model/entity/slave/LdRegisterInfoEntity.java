@@ -1,15 +1,24 @@
-package com.hanzhong.api.web.util.business.longdun.model;
+package com.hanzhong.api.web.model.entity.slave;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  *  
  *  @Description
  *  @Author   luqs   
- *  @Date 2019/1/10 20:02 
+ *  @Date 2019/1/13 15:11 
  *  @Version  V1.0   
  */
-public class RegisterInfo {
+public class LdRegisterInfoEntity {
+    /**
+     * id
+     */
+    private Long id;
+    /**
+     * 主体身份代码
+     */
+    private String pripId;
     /**
      * 企业名称
      */
@@ -29,7 +38,7 @@ public class RegisterInfo {
     /**
      * 成立日期
      */
-    private String esDate;
+    private Date esDate;
     /**
      * 经营状态
      */
@@ -61,27 +70,27 @@ public class RegisterInfo {
     /**
      * 经营期限自
      */
-    private String opFrom;
+    private Date opFrom;
     /**
      * 经营期限至
      */
-    private String opTo;
+    private Date opTo;
     /**
      * 核准日期
      */
-    private String apprDate;
+    private Date apprDate;
     /**
      * 死亡日期
      */
-    private String endDate;
+    private Date endDate;
     /**
      * 吊销日期
      */
-    private String revDate;
+    private Date revDate;
     /**
      * 注销日期
      */
-    private String canDate;
+    private Date canDate;
     /**
      * 地理坐标
      */
@@ -110,6 +119,26 @@ public class RegisterInfo {
      * 企业官网
      */
     private String webSite;
+    /**
+     * 更新时间（10位时间戳）
+     */
+    private Long updateTime;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getPripId() {
+        return pripId;
+    }
+
+    public void setPripId(String pripId) {
+        this.pripId = pripId;
+    }
 
     public String getEntName() {
         return entName;
@@ -143,11 +172,11 @@ public class RegisterInfo {
         this.frdb = frdb;
     }
 
-    public String getEsDate() {
+    public Date getEsDate() {
         return esDate;
     }
 
-    public void setEsDate(String esDate) {
+    public void setEsDate(Date esDate) {
         this.esDate = esDate;
     }
 
@@ -207,51 +236,51 @@ public class RegisterInfo {
         this.regOrg = regOrg;
     }
 
-    public String getOpFrom() {
+    public Date getOpFrom() {
         return opFrom;
     }
 
-    public void setOpFrom(String opFrom) {
+    public void setOpFrom(Date opFrom) {
         this.opFrom = opFrom;
     }
 
-    public String getOpTo() {
+    public Date getOpTo() {
         return opTo;
     }
 
-    public void setOpTo(String opTo) {
+    public void setOpTo(Date opTo) {
         this.opTo = opTo;
     }
 
-    public String getApprDate() {
+    public Date getApprDate() {
         return apprDate;
     }
 
-    public void setApprDate(String apprDate) {
+    public void setApprDate(Date apprDate) {
         this.apprDate = apprDate;
     }
 
-    public String getEndDate() {
+    public Date getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(String endDate) {
+    public void setEndDate(Date endDate) {
         this.endDate = endDate;
     }
 
-    public String getRevDate() {
+    public Date getRevDate() {
         return revDate;
     }
 
-    public void setRevDate(String revDate) {
+    public void setRevDate(Date revDate) {
         this.revDate = revDate;
     }
 
-    public String getCanDate() {
+    public Date getCanDate() {
         return canDate;
     }
 
-    public void setCanDate(String canDate) {
+    public void setCanDate(Date canDate) {
         this.canDate = canDate;
     }
 
@@ -311,27 +340,37 @@ public class RegisterInfo {
         this.webSite = webSite;
     }
 
+    public Long getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Long updateTime) {
+        this.updateTime = updateTime;
+    }
+
     @Override
     public String toString() {
-        return "RegisterInfo{" +
-                "entName='" + entName + '\'' +
+        return "LdRegisterInfoEntity{" +
+                "id=" + id +
+                ", pripId='" + pripId + '\'' +
+                ", entName='" + entName + '\'' +
                 ", oldName='" + oldName + '\'' +
                 ", shxydm='" + shxydm + '\'' +
                 ", frdb='" + frdb + '\'' +
-                ", esDate='" + esDate + '\'' +
+                ", esDate=" + esDate +
                 ", entStatus='" + entStatus + '\'' +
-                ", regCap='" + regCap + '\'' +
+                ", regCap=" + regCap +
                 ", regCapCur='" + regCapCur + '\'' +
                 ", dom='" + dom + '\'' +
                 ", entType='" + entType + '\'' +
                 ", opScope='" + opScope + '\'' +
                 ", regOrg='" + regOrg + '\'' +
-                ", opFrom='" + opFrom + '\'' +
-                ", opTo='" + opTo + '\'' +
-                ", apprDate='" + apprDate + '\'' +
-                ", endDate='" + endDate + '\'' +
-                ", revDate='" + revDate + '\'' +
-                ", canDate='" + canDate + '\'' +
+                ", opFrom=" + opFrom +
+                ", opTo=" + opTo +
+                ", apprDate=" + apprDate +
+                ", endDate=" + endDate +
+                ", revDate=" + revDate +
+                ", canDate=" + canDate +
                 ", jwd='" + jwd + '\'' +
                 ", industry='" + industry + '\'' +
                 ", industryCode='" + industryCode + '\'' +
@@ -339,6 +378,8 @@ public class RegisterInfo {
                 ", orgId='" + orgId + '\'' +
                 ", engName='" + engName + '\'' +
                 ", webSite='" + webSite + '\'' +
+                ", updateTime=" + updateTime +
                 '}';
     }
+
 }

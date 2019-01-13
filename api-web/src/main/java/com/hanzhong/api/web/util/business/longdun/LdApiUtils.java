@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ObjectInputStream;
+import java.math.BigDecimal;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.security.PublicKey;
@@ -46,7 +47,7 @@ public class LdApiUtils {
      * @return String
      */
     public static String getEntByKeyword(EntKeyWordQryParam keyWordQryParam) {
-        Map<String, String> paramMap = new HashMap<>();
+        Map<String, String> paramMap = new HashMap<>(2);
         paramMap.put("keyword", keyWordQryParam.getKeyword());
         paramMap.put("type", keyWordQryParam.getKeyWordTypeEnum().getValue());
 
@@ -77,7 +78,7 @@ public class LdApiUtils {
         Map<String, Object> resultMap = JSON.parseObject(resultJsonStr, Map.class);
         ApiResult apiResult = initCmnInfoOfApiResult(resultMap);
 
-        if (!"1".equals(apiResult.getIsMatch())) {
+        if (!CmnConstant.MATCH_DATA_FLAG.equals(apiResult.getIsMatch())) {
             logger.warn("keyWordQryParam：【{}】，resultJsonStr：【{}】，未查询到企业信息", keyWordQryParam, resultJsonStr);
             return apiResult;
         }
@@ -116,7 +117,7 @@ public class LdApiUtils {
      * @return String
      */
     public static String getRegisterInfo(RegisterInfoQryParam registerInfoQryParam) {
-        Map<String, String> paramMap = new HashMap<>();
+        Map<String, String> paramMap = new HashMap<>(1);
         paramMap.put("entName", registerInfoQryParam.getEntName());
 
         ApiParam apiParam = new ApiParam();
@@ -146,7 +147,7 @@ public class LdApiUtils {
         Map<String, Object> resultMap = JSON.parseObject(resultJsonStr, Map.class);
         ApiResult apiResult = initCmnInfoOfApiResult(resultMap);
 
-        if (!"1".equals(apiResult.getIsMatch())) {
+        if (!CmnConstant.MATCH_DATA_FLAG.equals(apiResult.getIsMatch())) {
             logger.warn("registerInfoQryParam：【{}】，resultJsonStr：【{}】，未查询到企业信息", registerInfoQryParam, resultJsonStr);
             return apiResult;
         }
@@ -168,7 +169,7 @@ public class LdApiUtils {
             info.setFrdb(ObjectUtils.defaultString(map.get("FRDB")));
             info.setEntType(ObjectUtils.defaultString(map.get("ENTTYPE")));
             info.setEntStatus(ObjectUtils.defaultString(map.get("ENTSTATUS")));
-            info.setRegCap(ObjectUtils.defaultString(map.get("REGCAP")));
+            info.setRegCap(BigDecimal.valueOf(ObjectUtils.defaultDouble(map.get("REGCAP"))));
             info.setRegCapCur(ObjectUtils.defaultString(map.get("REGCAPCUR")));
             info.setDom(ObjectUtils.defaultString(map.get("DOM")));
             info.setJwd(ObjectUtils.defaultString(map.get("JWD")));
@@ -182,7 +183,7 @@ public class LdApiUtils {
             info.setEsDate(ObjectUtils.defaultString(map.get("ESDATE")));
             info.setApprDate(ObjectUtils.defaultString(map.get("APPRDATE")));
             info.setRevDate(ObjectUtils.defaultString(map.get("REVDATE")));
-            info.setCanDate(ObjectUtils.defaultString(map.get("ENTNAME")));
+            info.setCanDate(ObjectUtils.defaultString(map.get("CANDATE")));
             info.setEndDate(ObjectUtils.defaultString(map.get("ENDDATE")));
             info.setWebSite(ObjectUtils.defaultString(map.get("WEBSITE")));
             infoList.add(info);
@@ -198,7 +199,7 @@ public class LdApiUtils {
      * @return String
      */
     public static String getShareHolderInfo(ShareHolderInfoQryParam shareHolderInfoQryParam) {
-        Map<String, Object> paramMap = new HashMap<>();
+        Map<String, Object> paramMap = new HashMap<>(3);
         paramMap.put("entName", shareHolderInfoQryParam.getEntName());
         paramMap.put("pageNo", shareHolderInfoQryParam.getPageNo());
         paramMap.put("pageSize", shareHolderInfoQryParam.getPageSize());
@@ -221,7 +222,7 @@ public class LdApiUtils {
      * @return String
      */
     public static String getInvestmentAbroadInfo(InvAbroadInfoQryParam invAbroadInfoQryParam) {
-        Map<String, Object> paramMap = new HashMap<>();
+        Map<String, Object> paramMap = new HashMap<>(3);
         paramMap.put("entName", invAbroadInfoQryParam.getEntName());
         paramMap.put("pageNo", invAbroadInfoQryParam.getPageNo());
         paramMap.put("pageSize", invAbroadInfoQryParam.getPageSize());
@@ -244,7 +245,7 @@ public class LdApiUtils {
      * @return String
      */
     public static String getBranchInfo(BranchInfoQryParam branchInfoQryParam) {
-        Map<String, Object> paramMap = new HashMap<>();
+        Map<String, Object> paramMap = new HashMap<>(3);
         paramMap.put("entName", branchInfoQryParam.getEntName());
         paramMap.put("pageNo", branchInfoQryParam.getPageNo());
         paramMap.put("pageSize", branchInfoQryParam.getPageSize());
@@ -267,7 +268,7 @@ public class LdApiUtils {
      * @return String
      */
     public static String getRegisterChangeInfo(RegChangeInfoQryParam regChangeInfoQryParam) {
-        Map<String, Object> paramMap = new HashMap<>();
+        Map<String, Object> paramMap = new HashMap<>(3);
         paramMap.put("entName", regChangeInfoQryParam.getEntName());
         paramMap.put("pageNo", regChangeInfoQryParam.getPageNo());
         paramMap.put("pageSize", regChangeInfoQryParam.getPageSize());
@@ -290,7 +291,7 @@ public class LdApiUtils {
      * @return String
      */
     public static String getMainManagerInfo(MainManagerInfoQryParam mainManagerInfoQryParam) {
-        Map<String, Object> paramMap = new HashMap<>();
+        Map<String, Object> paramMap = new HashMap<>(3);
         paramMap.put("entName", mainManagerInfoQryParam.getEntName());
         paramMap.put("pageNo", mainManagerInfoQryParam.getPageNo());
         paramMap.put("pageSize", mainManagerInfoQryParam.getPageSize());
@@ -313,7 +314,7 @@ public class LdApiUtils {
      * @return String
      */
     public static String getGoodsInfo(GoodsInfoQryParam goodsInfoQryParam) {
-        Map<String, Object> paramMap = new HashMap<>();
+        Map<String, Object> paramMap = new HashMap<>(3);
         paramMap.put("entName", goodsInfoQryParam.getEntName());
         paramMap.put("pageNo", goodsInfoQryParam.getPageNo());
         paramMap.put("pageSize", goodsInfoQryParam.getPageSize());
@@ -336,7 +337,7 @@ public class LdApiUtils {
      * @return String
      */
     public static String changeDataPackageList(ChangeDataPackageListQryParam listQryParam) {
-        Map<String, Object> paramMap = new HashMap<>();
+        Map<String, Object> paramMap = new HashMap<>(5);
         paramMap.put("actionType", listQryParam.getDataPackageActionTypeEnum().getValue());
         paramMap.put("startTime", listQryParam.getStartTime());
         paramMap.put("endTime", listQryParam.getEndTime());
@@ -361,7 +362,7 @@ public class LdApiUtils {
      * @return String
      */
     public static String monitorDataPackageFinish(DataPackageFinishParam finishParam) {
-        Map<String, Object> paramMap = new HashMap<>();
+        Map<String, Object> paramMap = new HashMap<>(1);
         paramMap.put("dataPackId", finishParam.getDataPackId());
 
         ApiParam apiParam = new ApiParam();
@@ -382,7 +383,7 @@ public class LdApiUtils {
      * @return String
      */
     public static String getEntAnnReportSocialSecurityInfo(EntAnnReportSocialSecurityInfoQryParam infoQryParam) {
-        Map<String, Object> paramMap = new HashMap<>();
+        Map<String, Object> paramMap = new HashMap<>(2);
         paramMap.put("entName", infoQryParam.getEntName());
         paramMap.put("reportDate", infoQryParam.getReportDate());
 
@@ -404,7 +405,7 @@ public class LdApiUtils {
      * @return String
      */
     public static String getListedCompanyBaseMessageInfoV2(ListedCompanyBaseMsgInfoV2QryParam infoV2QryParam) {
-        Map<String, Object> paramMap = new HashMap<>();
+        Map<String, Object> paramMap = new HashMap<>(1);
         paramMap.put("entName", infoV2QryParam.getEntName());
 
         ApiParam apiParam = new ApiParam();
@@ -425,7 +426,7 @@ public class LdApiUtils {
      * @return String
      */
     public static String getEntActualController(EntActualControllerQryParam controllerQryParam) {
-        Map<String, Object> paramMap = new HashMap<>();
+        Map<String, Object> paramMap = new HashMap<>(3);
         paramMap.put("entName", controllerQryParam.getEntName());
         paramMap.put("attIds", controllerQryParam.getAttIds());
         paramMap.put("level", controllerQryParam.getLevel());

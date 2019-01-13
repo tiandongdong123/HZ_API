@@ -2,6 +2,9 @@ package com.hanzhong.api.web.util;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.math.BigDecimal;
+import java.util.regex.Pattern;
+
 /**
  *  
  *  @Description
@@ -13,6 +16,11 @@ public class ObjectUtils {
 
     private ObjectUtils() {
     }
+
+    /**
+     * 正则表达式：含小数位
+     */
+    private static final String REGEX_DOUBLE = "^[0-9]+[.]*[0-9]*$";
 
     /**
      * Object转换成String
@@ -40,5 +48,24 @@ public class ObjectUtils {
             return Integer.parseInt((String) object);
         }
         return 0;
+    }
+
+    /**
+     * Object转换成double
+     *
+     * @param object Object
+     * @return int 若为空，则返回0
+     */
+    public static double defaultDouble(Object object) {
+        if (object instanceof BigDecimal) {
+            return ((BigDecimal) object).doubleValue();
+        } else if (object instanceof Double) {
+            return (Double) object;
+        } else if (object instanceof Integer) {
+            return (Integer) object;
+        } else if (object instanceof String && Pattern.matches(REGEX_DOUBLE, (String) object)) {
+            return Double.parseDouble((String) object);
+        }
+        return 0.00;
     }
 }

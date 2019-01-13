@@ -9,6 +9,13 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.zip.GZIPInputStream;
 
+/**
+ *    
+ *  @Description
+ *  @Author   龙盾提供 
+ *  @Date 2019/1/12 18:04 
+ *  @Version  V1.0   
+ */
 public class LdHttpUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(LdHttpUtils.class);

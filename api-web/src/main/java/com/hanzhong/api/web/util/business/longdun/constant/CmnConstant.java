@@ -11,6 +11,10 @@ public class CmnConstant {
      */
     public static final String LD_PROPERTIES_FILE = "longdun.properties";
     /**
+     * 匹配到数据标识
+     */
+    public static final String MATCH_DATA_FLAG = "1";
+    /**
      * 方法-企业名单检索
      */
     public static final String GET_ENT_BY_KEY_WORD_METHOD = "getEntByKeyword";

@@ -11,9 +11,9 @@ import com.hanzhong.api.web.util.business.auth.model.IpWhiteList;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +30,7 @@ public class IpWhiteListServiceImpl implements IpWhiteListService {
     private static final Logger logger = LoggerFactory.getLogger(IpWhiteListServiceImpl.class);
     private static final String SEPARATOR_WAVE = "~";
 
-    @Autowired
+    @Resource
     private TblIpWhiteListDao tblIpWhiteListDao;
 
     @Override

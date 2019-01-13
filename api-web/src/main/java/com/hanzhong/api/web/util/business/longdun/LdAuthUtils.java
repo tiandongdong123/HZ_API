@@ -11,7 +11,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 加密解密工具类
+ *    
+ *  @Description 加密解密工具类
+ *  @Author   龙盾提供   
+ *  @Date 2019/1/12 18:04 
+ *  @Version  V1.0   
  */
 public class LdAuthUtils {
 

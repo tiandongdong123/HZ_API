@@ -21,6 +21,7 @@
         <fastjson.version>1.2.47</fastjson.version>
         <httpclient.version>4.5.5</httpclient.version>
         <poi-ooxml.version>3.17</poi-ooxml.version>
+        <guava.version>21.0</guava.version>
         <logback.version>1.2.3</logback.version>
         <!--数据库相关-->
         <mysql.version>8.0.11</mysql.version>
@@ -62,6 +63,12 @@
                 <groupId>org.apache.poi</groupId>
                 <artifactId>poi-ooxml</artifactId>
                 <version>${poi-ooxml.version}</version>
+            </dependency>
+            <!--guava-->
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
             </dependency>
 
             <!--spring boot start-->

@@ -1,5 +1,6 @@
 package com.hanzhong.api.web.controller;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.hanzhong.api.web.constant.cmnenum.EntStatusEnum;
 import com.hanzhong.api.web.constant.cmnenum.ProductParamEnum;
 import com.hanzhong.api.web.constant.cmnenum.ResultCodeEnum;
@@ -8,6 +9,7 @@ import com.hanzhong.api.web.model.bo.CompanyInfoBO;
 import com.hanzhong.api.web.model.bo.CompanyQryBO;
 import com.hanzhong.api.web.model.vo.CompanyInfoVO;
 import com.hanzhong.api.web.service.BusinessService;
+import com.hanzhong.api.web.service.LdDataService;
 import com.hanzhong.api.web.util.CheckUtils;
 import com.hanzhong.api.web.util.business.AdminCodeUtils;
 import com.hanzhong.api.web.util.business.DevZoneCodeUtils;
@@ -21,15 +23,18 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  *  
@@ -56,9 +61,18 @@ public class ProductController {
      * 市辖区
      */
     private static final String MUNICIPAL_DISTRICT = "市辖区";
+    /**
+     * 线程池（注：设置线程池参数时，请详细了解ThreadPoolExecutor的相关知识，以免出现OOM）
+     */
+    private static ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(10, 20, 30, TimeUnit.SECONDS,
+            new ArrayBlockingQueue<>(1024), new ThreadFactoryBuilder().setNameFormat("threadPool_ldData_%d").build(),
+            new ThreadPoolExecutor.DiscardPolicy());
 
-    @Autowired
+    @Resource
     private BusinessService businessService;
+
+    @Resource
+    private LdDataService ldDataService;
 
     /**
      * 获取企业信息
@@ -150,6 +164,8 @@ public class ProductController {
                 logger.warn("第三方通过企业名称【{}】查询未查询到企业信息", companyName);
                 return null;
             }
+            // 异步记录龙盾企业信息数据
+            asyncRecordLdRegisterInfoData(registerInfo);
             return mergeCompanyInfo(companyInfoBO, registerInfo);
         }
 
@@ -170,12 +186,14 @@ public class ProductController {
             if (registerInfo == null) {
                 return null;
             }
+            // 异步记录龙盾企业信息数据
+            asyncRecordLdRegisterInfoData(registerInfo);
             return mergeCompanyInfo(companyInfoBO, registerInfo);
         }
 
         // 通过组织结构代码查询
         String orgCode = companyQryBO.getOrgCode();
-        if (companyInfoBOList == null || companyInfoBOList.isEmpty()) {
+        if (companyInfoBOList.isEmpty()) {
             logger.info("通过组织结构代码【{}】查询的企业信息为空！", orgCode);
             return null;
         }
@@ -187,6 +205,8 @@ public class ProductController {
             logger.info("通过组织结构代码【{}】查询企业名称为【{}】的企业信息为空！", orgCode, companyInfoBO.getEntName());
             return null;
         }
+        // 异步记录龙盾企业信息数据
+        asyncRecordLdRegisterInfoData(registerInfo);
         return mergeCompanyInfo(companyInfoBO, registerInfo);
     }
 
@@ -350,7 +370,7 @@ public class ProductController {
         companyInfoVO.setOrgCode(CheckUtils.isOrganizationCode(registerInfo.getOrgId()) ? registerInfo.getOrgId() : "");
         companyInfoVO.setEntName(registerInfo.getEntName());
         companyInfoVO.setIndustry(registerInfo.getIndustry());
-        companyInfoVO.setRegCap(StringUtils.isBlank(registerInfo.getRegCap()) ? null : new BigDecimal(registerInfo.getRegCap()));
+        companyInfoVO.setRegCap(registerInfo.getRegCap());
         companyInfoVO.setRegCapCur(registerInfo.getRegCapCur());
         companyInfoVO.setEntType(registerInfo.getEntType());
         companyInfoVO.setEntStatus(registerInfo.getEntStatus());
@@ -366,5 +386,16 @@ public class ProductController {
         companyInfoVO.setDomDistrict(getDomDistrictNameByCode(companyInfoBO.getProvince(), companyInfoBO.getCity(), companyInfoBO.getArea()));
         companyInfoVO.setEcoTecDevZone(DevZoneCodeUtils.getNameByCode(companyInfoBO.getEcoTecDevZone()));
         return companyInfoVO;
+    }
+
+    /**
+     * 异步记录龙盾企业信息数据
+     *
+     * @param registerInfo 企业登记信息
+     */
+    private void asyncRecordLdRegisterInfoData(RegisterInfo registerInfo) {
+        threadPoolExecutor.execute(() ->
+                ldDataService.recordRegisterInfo(registerInfo)
+        );
     }
 }

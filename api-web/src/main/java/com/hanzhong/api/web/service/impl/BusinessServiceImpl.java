@@ -4,9 +4,9 @@ import com.hanzhong.api.web.dao.master.TblBusinessDao;
 import com.hanzhong.api.web.model.bo.CompanyInfoBO;
 import com.hanzhong.api.web.model.bo.CompanyQryBO;
 import com.hanzhong.api.web.service.BusinessService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -19,7 +19,7 @@ import java.util.List;
 @Service("businessService")
 public class BusinessServiceImpl implements BusinessService {
 
-    @Autowired
+    @Resource
     private TblBusinessDao tblBusinessDao;
 
     @Override

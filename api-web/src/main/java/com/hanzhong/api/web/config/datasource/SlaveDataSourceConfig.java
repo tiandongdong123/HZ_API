@@ -23,7 +23,7 @@ import javax.sql.DataSource;
 public class SlaveDataSourceConfig {
 
     protected static final String BASE_PACKAGES = "com.hanzhong.api.web.dao.slave";
-    private static final String LOCATION_PATTERN = "classpath*:com/hanzhong/api/web/mapping/adminmanager/*Mapper.xml";
+    private static final String LOCATION_PATTERN = "classpath*:com/hanzhong/api/web/mapping/slave/*Mapper.xml";
 
     @Bean(name = "slaveDataSource")
     @ConfigurationProperties(prefix = "spring.datasource.slave")
