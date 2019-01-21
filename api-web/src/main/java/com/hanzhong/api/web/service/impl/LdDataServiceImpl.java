@@ -1,13 +1,16 @@
 package com.hanzhong.api.web.service.impl;
 
+import com.hanzhong.api.web.constant.CmnConstant;
 import com.hanzhong.api.web.dao.slave.LdRegisterInfoDao;
 import com.hanzhong.api.web.model.entity.slave.LdRegisterInfoEntity;
 import com.hanzhong.api.web.service.LdDataService;
 import com.hanzhong.api.web.util.DateUtils;
 import com.hanzhong.api.web.util.business.longdun.model.RegisterInfo;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -70,15 +73,29 @@ public class LdDataServiceImpl implements LdDataService {
         registerInfoEntity.setJwd(registerInfo.getJwd());
         registerInfoEntity.setProvince(registerInfo.getProvince());
         registerInfoEntity.setWebSite(registerInfo.getWebSite());
-        registerInfoEntity.setEsDate(DateUtils.parse(registerInfo.getEsDate(), DateUtils.DEFAULT_DATE_FORMAT));
-        registerInfoEntity.setOpFrom(DateUtils.parse(registerInfo.getOpFrom(), DateUtils.DEFAULT_DATE_FORMAT));
-        registerInfoEntity.setOpTo(DateUtils.parse(registerInfo.getOpTo(), DateUtils.DEFAULT_DATE_FORMAT));
-        registerInfoEntity.setApprDate(DateUtils.parse(registerInfo.getApprDate(), DateUtils.DEFAULT_DATE_FORMAT));
-        registerInfoEntity.setEndDate(DateUtils.parse(registerInfo.getEndDate(), DateUtils.DEFAULT_DATE_FORMAT));
-        registerInfoEntity.setRevDate(DateUtils.parse(registerInfo.getRevDate(), DateUtils.DEFAULT_DATE_FORMAT));
-        registerInfoEntity.setCanDate(DateUtils.parse(registerInfo.getCanDate(), DateUtils.DEFAULT_DATE_FORMAT));
+        registerInfoEntity.setEsDate(parseByDateFormat(registerInfo.getEsDate()));
+        registerInfoEntity.setOpFrom(parseByDateFormat(registerInfo.getOpFrom()));
+        registerInfoEntity.setOpTo(CmnConstant.LONG_TERM_WROD.equals(registerInfo.getOpTo()) ? null : parseByDateFormat(registerInfo.getOpTo()));
+        registerInfoEntity.setApprDate(parseByDateFormat(registerInfo.getApprDate()));
+        registerInfoEntity.setEndDate(parseByDateFormat(registerInfo.getEndDate()));
+        registerInfoEntity.setRevDate(parseByDateFormat(registerInfo.getRevDate()));
+        registerInfoEntity.setCanDate(parseByDateFormat(registerInfo.getCanDate()));
         registerInfoEntity.setUpdateTime(DateUtils.getCurrentTimeStamp());
         return registerInfoEntity;
+    }
+
+    /**
+     * 解析成Date
+     *
+     * @param dateStr 时间字符串，格式：yyyy-MM-dd
+     * @return Date
+     */
+    private Date parseByDateFormat(String dateStr) {
+        if (StringUtils.isBlank(dateStr)) {
+            return null;
+        }
+
+        return DateUtils.parse(dateStr, DateUtils.DEFAULT_DATE_FORMAT);
     }
 
     /**

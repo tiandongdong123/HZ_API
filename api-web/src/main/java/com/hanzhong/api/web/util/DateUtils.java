@@ -67,18 +67,7 @@ public class DateUtils {
      * @return Date 若转换失败，则返回null
      */
     public static Date parse(String dateStr) {
-        if (StringUtils.isBlank(dateStr)) {
-            return null;
-        }
-
-        SimpleDateFormat sdf = new SimpleDateFormat(DEFAULT_DATETIME_FORMAT);
-        Date date = null;
-        try {
-            date = sdf.parse(dateStr);
-        } catch (ParseException e) {
-            logger.error("dateStr：【{}】，将String转换成Date出现异常：", dateStr, e);
-        }
-        return date;
+        return parse(dateStr, DEFAULT_DATETIME_FORMAT);
     }
 
     /**
@@ -97,19 +86,6 @@ public class DateUtils {
             logger.error("dateStr：【{}】，将String转换成Date出现异常：", dateStr, e);
         }
         return date;
-    }
-
-    /**
-     * 将Date转换为String
-     *
-     * @param date          日期
-     * @param dateFormatStr 时间格式
-     * @return String
-     */
-    public static String dateToStr(Date date, String dateFormatStr) {
-        SimpleDateFormat formatter = new SimpleDateFormat(dateFormatStr);
-        String dateString = formatter.format(date);
-        return dateString;
     }
 
     /**

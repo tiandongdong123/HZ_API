@@ -1,6 +1,7 @@
 package com.hanzhong.api.web.controller;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.hanzhong.api.web.constant.CmnConstant;
 import com.hanzhong.api.web.constant.cmnenum.EntStatusEnum;
 import com.hanzhong.api.web.constant.cmnenum.ProductParamEnum;
 import com.hanzhong.api.web.constant.cmnenum.ResultCodeEnum;
@@ -19,6 +20,9 @@ import com.hanzhong.api.web.util.business.area.AreaCodeUtils;
 import com.hanzhong.api.web.util.business.longdun.LdApiUtils;
 import com.hanzhong.api.web.util.business.longdun.constant.KeyWordTypeEnum;
 import com.hanzhong.api.web.util.business.longdun.model.*;
+import com.hanzhong.api.web.util.gaodemap.geocode.GeoCodeUtils;
+import com.hanzhong.api.web.util.gaodemap.geocode.model.GcGeoCode;
+import com.hanzhong.api.web.util.gaodemap.geocode.model.GcQryResult;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -239,7 +243,7 @@ public class ProductController {
         }
         // 经营(驻在)期限至
         if (companyInfoVO.getOpFrom() != null && companyInfoVO.getOpTo() == null) {
-            companyInfoVO.setOpTo("4999-12-31");
+            companyInfoVO.setOpTo(CmnConstant.LONG_TERM_DATE);
         }
         // 登记机关
         code = companyInfoVO.getRegOrg();
@@ -285,23 +289,13 @@ public class ProductController {
      * @return String 如：湖北省/黄石市/西塞山区
      */
     private String getDomDistrictNameByCode(Integer provinceCode, Integer cityCode, Integer areaCode) {
-        StringBuilder strBuilder = new StringBuilder();
         // 省
         String provinceName = provinceCode == null ? "" : AreaCodeUtils.getAreaNameByCode(provinceCode.toString());
-        if (StringUtils.isNotEmpty(provinceName)) {
-            strBuilder.append(provinceName);
-        }
-        // 市，若为“市辖区”则不拼
+        // 市
         String cityName = cityCode == null ? "" : AreaCodeUtils.getAreaNameByCode(cityCode.toString());
-        if (StringUtils.isNotEmpty(cityName) && !MUNICIPAL_DISTRICT.equals(cityName)) {
-            strBuilder.append(SLASH_SEPARATOR + cityName);
-        }
         // 区
-        String areaName = areaCode == null ? "" : AreaCodeUtils.getAreaNameByCode(areaCode.toString());
-        if (StringUtils.isNotEmpty(areaName)) {
-            strBuilder.append(SLASH_SEPARATOR + areaName);
-        }
-        return strBuilder.toString();
+        String districtName = areaCode == null ? "" : AreaCodeUtils.getAreaNameByCode(areaCode.toString());
+        return connectAdministrativeDivision(provinceName, cityName, districtName);
     }
 
     /**
@@ -378,14 +372,68 @@ public class ProductController {
         companyInfoVO.setEsDate(registerInfo.getEsDate());
         companyInfoVO.setApprDate(registerInfo.getApprDate());
         companyInfoVO.setOpFrom(registerInfo.getOpFrom());
-        companyInfoVO.setOpTo(StringUtils.isBlank(registerInfo.getOpTo()) || "长期".equals(registerInfo.getOpTo()) ? "4999-12-31" : registerInfo.getOpTo());
+        companyInfoVO.setOpTo(StringUtils.isBlank(registerInfo.getOpTo()) || CmnConstant.LONG_TERM_WROD.equals(registerInfo.getOpTo()) ? CmnConstant.LONG_TERM_DATE : registerInfo.getOpTo());
         companyInfoVO.setName(registerInfo.getFrdb());
         companyInfoVO.setRegOrg(registerInfo.getRegOrg());
         companyInfoVO.setDom(registerInfo.getDom());
         companyInfoVO.setPostalCode(companyInfoBO.getPostalCode());
-        companyInfoVO.setDomDistrict(getDomDistrictNameByCode(companyInfoBO.getProvince(), companyInfoBO.getCity(), companyInfoBO.getArea()));
+        // 住所行政区划
+        String domDistrict = getDomDistrictNameByCode(companyInfoBO.getProvince(), companyInfoBO.getCity(), companyInfoBO.getArea());
+        if (StringUtils.isBlank(domDistrict)) {
+            domDistrict = getAdministrativeDivision(registerInfo.getDom());
+        }
+        companyInfoVO.setDomDistrict(domDistrict);
         companyInfoVO.setEcoTecDevZone(DevZoneCodeUtils.getNameByCode(companyInfoBO.getEcoTecDevZone()));
         return companyInfoVO;
+    }
+
+    /**
+     * 获取行政区划信息
+     *
+     * @param address 地址
+     * @return String
+     */
+    private String getAdministrativeDivision(String address) {
+        GcQryResult gcQryResult = GeoCodeUtils.getGeoCodeInfo(address, "");
+        // 判断是否有查询结果
+        boolean haveResultFlag = GeoCodeUtils.isSuccess(gcQryResult) && Integer.parseInt(StringUtils.defaultIfEmpty(gcQryResult.getCount(), "0")) > 0;
+        if (!haveResultFlag) {
+            logger.warn("address：【{}】，通过地址获取的地理编码信息为空！", address);
+            return StringUtils.EMPTY;
+        }
+
+        List<GcGeoCode> gcGeoCodeList = gcQryResult.getGcGeoCodes();
+        // 若只有一条查询结果，则取之
+        if (gcGeoCodeList != null && gcGeoCodeList.size() == 1) {
+            GcGeoCode gcGeoCode = gcGeoCodeList.get(0);
+            return connectAdministrativeDivision(gcGeoCode.getProvince(), gcGeoCode.getCity(), gcGeoCode.getDistrict());
+        }
+        return StringUtils.EMPTY;
+    }
+
+    /**
+     * 拼接省市区名称（以“/”分隔）
+     *
+     * @param province 省
+     * @param city     市
+     * @param district 区
+     * @return String 如：湖北省/黄石市/西塞山区
+     */
+    private String connectAdministrativeDivision(String province, String city, String district) {
+        StringBuilder strBuilder = new StringBuilder();
+        // 省
+        if (StringUtils.isNotBlank(province)) {
+            strBuilder.append(province);
+        }
+        // 市，若为“市辖区”则不拼
+        if (StringUtils.isNotBlank(city) && !MUNICIPAL_DISTRICT.equals(city) && !city.equals(province)) {
+            strBuilder.append(SLASH_SEPARATOR + city);
+        }
+        // 区
+        if (StringUtils.isNotBlank(district)) {
+            strBuilder.append(SLASH_SEPARATOR + district);
+        }
+        return strBuilder.toString();
     }
 
     /**
