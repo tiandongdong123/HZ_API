@@ -33,7 +33,7 @@
     </resultMap>
 
     <!--获取企业登记信息-->
-    <select id="getRegisterInfoListByQryParam" resultMap="registerInfoMap">
+    <select id="getRegisterInfoListByQryParam" parameterType="com.hanzhong.api.web.model.bo.LdRegisterInfoQryBO" resultMap="registerInfoMap">
         SELECT
         ID, PRIPID,ENTNAME, OLDNAME, SHXYDM, FRDB, ESDATE, ENTSTATUS, REGCAP, REGCAPCUR, DOM, ENTTYPE, OPSCOPE,
         REGORG, OPFROM, OPTO, APPRDATE, ENDDATE, REVDATE, CANDATE, JWD, INDUSTRY, INDUSTRY_CODE, PROVINCE, ORGID,
@@ -42,6 +42,12 @@
         <where>
             <if test="entName != null and entName != ''">
                 AND ENTNAME = #{entName}
+            </if>
+            <if test="usCreditCode != null and usCreditCode != ''">
+                AND SHXYDM = #{usCreditCode}
+            </if>
+            <if test="orgCode != null and orgCode != ''">
+                AND ORGID = #{orgCode}
             </if>
         </where>
     </select>

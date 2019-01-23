@@ -2,6 +2,7 @@ package com.hanzhong.api.web.service.impl;
 
 import com.hanzhong.api.web.constant.CmnConstant;
 import com.hanzhong.api.web.dao.slave.LdRegisterInfoDao;
+import com.hanzhong.api.web.model.bo.LdRegisterInfoQryBO;
 import com.hanzhong.api.web.model.entity.slave.LdRegisterInfoEntity;
 import com.hanzhong.api.web.service.LdDataService;
 import com.hanzhong.api.web.util.DateUtils;
@@ -28,9 +29,16 @@ public class LdDataServiceImpl implements LdDataService {
     private LdRegisterInfoDao ldRegisterInfoDao;
 
     @Override
+    public List<LdRegisterInfoEntity> getRegisterInfoListByQryParam(LdRegisterInfoQryBO qryBO) {
+        return ldRegisterInfoDao.getRegisterInfoListByQryParam(qryBO);
+    }
+
+    @Override
     public int recordRegisterInfo(RegisterInfo registerInfo) {
+        LdRegisterInfoQryBO qryBO = new LdRegisterInfoQryBO();
+        qryBO.setEntName(registerInfo.getEntName());
         // 查询企业信息
-        List<LdRegisterInfoEntity> registerInfoEntityList = ldRegisterInfoDao.getRegisterInfoListByQryParam(registerInfo.getEntName());
+        List<LdRegisterInfoEntity> registerInfoEntityList = ldRegisterInfoDao.getRegisterInfoListByQryParam(qryBO);
 
         // 若不存在此企业，则添加，否则更新
         if (registerInfoEntityList.isEmpty()) {
@@ -75,7 +83,7 @@ public class LdDataServiceImpl implements LdDataService {
         registerInfoEntity.setWebSite(registerInfo.getWebSite());
         registerInfoEntity.setEsDate(parseByDateFormat(registerInfo.getEsDate()));
         registerInfoEntity.setOpFrom(parseByDateFormat(registerInfo.getOpFrom()));
-        registerInfoEntity.setOpTo(CmnConstant.LONG_TERM_WROD.equals(registerInfo.getOpTo()) ? null : parseByDateFormat(registerInfo.getOpTo()));
+        registerInfoEntity.setOpTo(CmnConstant.LONG_TERM_WORD.equals(registerInfo.getOpTo()) ? null : parseByDateFormat(registerInfo.getOpTo()));
         registerInfoEntity.setApprDate(parseByDateFormat(registerInfo.getApprDate()));
         registerInfoEntity.setEndDate(parseByDateFormat(registerInfo.getEndDate()));
         registerInfoEntity.setRevDate(parseByDateFormat(registerInfo.getRevDate()));

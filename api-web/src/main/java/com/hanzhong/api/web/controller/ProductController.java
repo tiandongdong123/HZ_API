@@ -8,10 +8,13 @@ import com.hanzhong.api.web.constant.cmnenum.ResultCodeEnum;
 import com.hanzhong.api.web.model.JsonResult;
 import com.hanzhong.api.web.model.bo.CompanyInfoBO;
 import com.hanzhong.api.web.model.bo.CompanyQryBO;
+import com.hanzhong.api.web.model.bo.LdRegisterInfoQryBO;
+import com.hanzhong.api.web.model.entity.slave.LdRegisterInfoEntity;
 import com.hanzhong.api.web.model.vo.CompanyInfoVO;
 import com.hanzhong.api.web.service.BusinessService;
 import com.hanzhong.api.web.service.LdDataService;
 import com.hanzhong.api.web.util.CheckUtils;
+import com.hanzhong.api.web.util.DateUtils;
 import com.hanzhong.api.web.util.business.AdminCodeUtils;
 import com.hanzhong.api.web.util.business.DevZoneCodeUtils;
 import com.hanzhong.api.web.util.business.EntTypeCodeUtils;
@@ -35,6 +38,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -158,6 +162,24 @@ public class ProductController {
             companyInfoBO = companyInfoBOList.get(0);
         }
 
+        // 查询已记录过龙盾数据
+        LdRegisterInfoQryBO qryBO = new LdRegisterInfoQryBO();
+        qryBO.setEntName(companyQryBO.getCompanyName());
+        qryBO.setUsCreditCode(companyQryBO.getUsCreditCode());
+        qryBO.setOrgCode(companyQryBO.getOrgCode());
+        // 查询企业信息
+        List<LdRegisterInfoEntity> registerInfoEntityList = ldDataService.getRegisterInfoListByQryParam(qryBO);
+        if (!registerInfoEntityList.isEmpty()) {
+            LdRegisterInfoEntity registerInfoEntity = registerInfoEntityList.get(0);
+
+            // 若当前时间与数据更新时间差小于数据更新间隔，则取已有数据
+            long currentTimeStamp = DateUtils.getCurrentTimeStamp();
+            if (registerInfoEntity.getUpdateTime() != null && (currentTimeStamp - registerInfoEntity.getUpdateTime()) <= CmnConstant.THIRD_PARTY_DATA_UPDATE_INTERVAL) {
+                logger.info("CompanyQryBO：【{}】，LdRegisterInfoQryBO：【{}】，从ld_register_info表查询的结果：【{}】", companyQryBO, qryBO, registerInfoEntity);
+                return mergeCompanyInfo(companyInfoBO, registerInfoEntity);
+            }
+        }
+
         // 通过企业名称查询
         String companyName = companyQryBO.getCompanyName();
         if (StringUtils.isNotBlank(companyName)) {
@@ -165,7 +187,7 @@ public class ProductController {
             infoQryParam.setEntName(companyName);
             RegisterInfo registerInfo = getRegisterInfo(infoQryParam);
             if (registerInfo == null) {
-                logger.warn("第三方通过企业名称【{}】查询未查询到企业信息", companyName);
+                logger.info("第三方通过企业名称【{}】查询未查询到企业信息", companyName);
                 return null;
             }
             // 异步记录龙盾企业信息数据
@@ -181,13 +203,14 @@ public class ProductController {
             keyWordQryParam.setKeyWordTypeEnum(KeyWordTypeEnum.REG_NUM_OR_USCC_NUM);
             EntInfo entInfo = getUniqueEntInfo(keyWordQryParam);
             if (entInfo == null) {
-                logger.warn("第三方通过统一社会信用代码【{}】查询未查询到企业信息", usCreditCode);
+                logger.info("第三方通过统一社会信用代码【{}】查询未查询到企业信息", usCreditCode);
                 return null;
             }
             RegisterInfoQryParam infoQryParam = new RegisterInfoQryParam();
             infoQryParam.setEntName(entInfo.getEntName());
             RegisterInfo registerInfo = getRegisterInfo(infoQryParam);
             if (registerInfo == null) {
+                logger.info("统一社会信用代码【{}】，第三方通过企业名称【{}】查询未查询到企业信息", usCreditCode, entInfo.getEntName());
                 return null;
             }
             // 异步记录龙盾企业信息数据
@@ -372,7 +395,7 @@ public class ProductController {
         companyInfoVO.setEsDate(registerInfo.getEsDate());
         companyInfoVO.setApprDate(registerInfo.getApprDate());
         companyInfoVO.setOpFrom(registerInfo.getOpFrom());
-        companyInfoVO.setOpTo(StringUtils.isBlank(registerInfo.getOpTo()) || CmnConstant.LONG_TERM_WROD.equals(registerInfo.getOpTo()) ? CmnConstant.LONG_TERM_DATE : registerInfo.getOpTo());
+        companyInfoVO.setOpTo(StringUtils.isBlank(registerInfo.getOpTo()) || CmnConstant.LONG_TERM_WORD.equals(registerInfo.getOpTo()) ? CmnConstant.LONG_TERM_DATE : registerInfo.getOpTo());
         companyInfoVO.setName(registerInfo.getFrdb());
         companyInfoVO.setRegOrg(registerInfo.getRegOrg());
         companyInfoVO.setDom(registerInfo.getDom());
@@ -385,6 +408,52 @@ public class ProductController {
         companyInfoVO.setDomDistrict(domDistrict);
         companyInfoVO.setEcoTecDevZone(DevZoneCodeUtils.getNameByCode(companyInfoBO.getEcoTecDevZone()));
         return companyInfoVO;
+    }
+
+    /**
+     * 合并企业结果信息
+     *
+     * @param companyInfoBO      本地库企业信息
+     * @param registerInfoEntity 第三方提供企业信息
+     * @return CompanyInfoVO
+     */
+    private CompanyInfoVO mergeCompanyInfo(CompanyInfoBO companyInfoBO, LdRegisterInfoEntity registerInfoEntity) {
+        CompanyInfoVO companyInfoVO = new CompanyInfoVO();
+        companyInfoVO.setUsCreditCode(CheckUtils.isUnifiedSocialCreditCode(registerInfoEntity.getShxydm()) ? registerInfoEntity.getShxydm() : "");
+        companyInfoVO.setOrgCode(CheckUtils.isOrganizationCode(registerInfoEntity.getOrgId()) ? registerInfoEntity.getOrgId() : "");
+        companyInfoVO.setEntName(registerInfoEntity.getEntName());
+        companyInfoVO.setIndustry(registerInfoEntity.getIndustry());
+        companyInfoVO.setRegCap(registerInfoEntity.getRegCap());
+        companyInfoVO.setRegCapCur(registerInfoEntity.getRegCapCur());
+        companyInfoVO.setEntType(registerInfoEntity.getEntType());
+        companyInfoVO.setEntStatus(registerInfoEntity.getEntStatus());
+        companyInfoVO.setOpScope(registerInfoEntity.getOpScope());
+        companyInfoVO.setEsDate(dateFormatIfBlank(registerInfoEntity.getEsDate()));
+        companyInfoVO.setApprDate(dateFormatIfBlank(registerInfoEntity.getApprDate()));
+        companyInfoVO.setOpFrom(dateFormatIfBlank(registerInfoEntity.getOpFrom()));
+        companyInfoVO.setOpTo((registerInfoEntity.getOpFrom() != null && registerInfoEntity.getOpTo() == null) ? CmnConstant.LONG_TERM_DATE : null);
+        companyInfoVO.setName(registerInfoEntity.getFrdb());
+        companyInfoVO.setRegOrg(registerInfoEntity.getRegOrg());
+        companyInfoVO.setDom(registerInfoEntity.getDom());
+        companyInfoVO.setPostalCode(companyInfoBO.getPostalCode());
+        // 住所行政区划
+        String domDistrict = getDomDistrictNameByCode(companyInfoBO.getProvince(), companyInfoBO.getCity(), companyInfoBO.getArea());
+        if (StringUtils.isBlank(domDistrict)) {
+            domDistrict = getAdministrativeDivision(registerInfoEntity.getDom());
+        }
+        companyInfoVO.setDomDistrict(domDistrict);
+        companyInfoVO.setEcoTecDevZone(DevZoneCodeUtils.getNameByCode(companyInfoBO.getEcoTecDevZone()));
+        return companyInfoVO;
+    }
+
+    /**
+     * 格式化时间
+     *
+     * @param date 时间字
+     * @return String
+     */
+    private String dateFormatIfBlank(Date date) {
+        return date == null ? null : DateUtils.dateFormat(date);
     }
 
     /**

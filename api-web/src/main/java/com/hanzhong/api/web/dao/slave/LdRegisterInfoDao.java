@@ -1,7 +1,7 @@
 package com.hanzhong.api.web.dao.slave;
 
+import com.hanzhong.api.web.model.bo.LdRegisterInfoQryBO;
 import com.hanzhong.api.web.model.entity.slave.LdRegisterInfoEntity;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -16,10 +16,10 @@ public interface LdRegisterInfoDao {
     /**
      * 获取企业登记信息
      *
-     * @param entName 企业名称
-     * @return int
+     * @param qryBO 查询参数
+     * @return List<LdRegisterInfoEntity>
      */
-    List<LdRegisterInfoEntity> getRegisterInfoListByQryParam(@Param("entName") String entName);
+    List<LdRegisterInfoEntity> getRegisterInfoListByQryParam(LdRegisterInfoQryBO qryBO);
 
     /**
      * 添加企业登记信息
