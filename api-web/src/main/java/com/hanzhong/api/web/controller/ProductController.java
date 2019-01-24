@@ -431,7 +431,7 @@ public class ProductController {
         companyInfoVO.setEsDate(dateFormatIfBlank(registerInfoEntity.getEsDate()));
         companyInfoVO.setApprDate(dateFormatIfBlank(registerInfoEntity.getApprDate()));
         companyInfoVO.setOpFrom(dateFormatIfBlank(registerInfoEntity.getOpFrom()));
-        companyInfoVO.setOpTo((registerInfoEntity.getOpFrom() != null && registerInfoEntity.getOpTo() == null) ? CmnConstant.LONG_TERM_DATE : null);
+        companyInfoVO.setOpTo((registerInfoEntity.getOpFrom() != null && registerInfoEntity.getOpTo() == null) ? CmnConstant.LONG_TERM_DATE : dateFormatIfBlank(registerInfoEntity.getOpTo()));
         companyInfoVO.setName(registerInfoEntity.getFrdb());
         companyInfoVO.setRegOrg(registerInfoEntity.getRegOrg());
         companyInfoVO.setDom(registerInfoEntity.getDom());
@@ -453,7 +453,7 @@ public class ProductController {
      * @return String
      */
     private String dateFormatIfBlank(Date date) {
-        return date == null ? null : DateUtils.dateFormat(date);
+        return date == null ? null : DateUtils.dateFormat(date, DateUtils.DEFAULT_DATE_FORMAT);
     }
 
     /**
