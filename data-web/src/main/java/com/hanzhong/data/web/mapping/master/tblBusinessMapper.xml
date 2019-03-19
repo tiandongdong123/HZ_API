@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hanzhong.data.web.dao.master.TblBusinessDao">
+    <resultMap id="enterpriseInfoMap" type="com.hanzhong.data.web.model.bo.EnterpriseInfoBO">
+        <result column="PRIPID" property="pripId" jdbcType="VARCHAR"/>
+        <result column="CREDITCODE" property="usCreditCode" jdbcType="VARCHAR"/>
+        <result column="ORGCODE" property="orgCode" jdbcType="VARCHAR"/>
+        <result column="ENTNAME" property="entName" jdbcType="VARCHAR"/>
+        <result column="INDUSTRY" property="industry" jdbcType="VARCHAR"/>
+        <result column="REGCAP" property="regCap" jdbcType="DECIMAL"/>
+        <result column="REGCAPCUR" property="regCapCur" jdbcType="VARCHAR"/>
+        <result column="ENTTYPE" property="entType" jdbcType="VARCHAR"/>
+        <result column="ENTSTATUS" property="entStatus" jdbcType="VARCHAR"/>
+        <result column="OPSCOPE" property="opScope" jdbcType="VARCHAR"/>
+        <result column="ESDATE" property="esDate" jdbcType="DATE"/>
+        <result column="APPRDATE" property="apprDate" jdbcType="DATE"/>
+        <result column="ENDDATE" property="endDate" jdbcType="DATE"/>
+        <result column="REVDATE" property="revDate" jdbcType="DATE"/>
+        <result column="CANDATE" property="canDate" jdbcType="DATE"/>
+        <result column="OPFROM" property="opFrom" jdbcType="DATE"/>
+        <result column="OPTO" property="opTo" jdbcType="DATE"/>
+        <result column="NAME" property="name" jdbcType="VARCHAR"/>
+        <result column="REGORG" property="regOrg" jdbcType="VARCHAR"/>
+        <result column="DOM" property="dom" jdbcType="VARCHAR"/>
+        <result column="OPLOC" property="opLoc" jdbcType="VARCHAR"/>
+        <result column="POSTALCODE" property="postalCode" jdbcType="VARCHAR"/>
+        <result column="DOMDISTRICT" property="domDistrict" jdbcType="VARCHAR"/>
+        <result column="ECOTECDEVZONE" property="ecoTecDevZone" jdbcType="VARCHAR"/>
+        <result column="PROVINCE" property="province" jdbcType="INTEGER"/>
+        <result column="CITY" property="city" jdbcType="INTEGER"/>
+        <result column="AREA" property="area" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!--获取企业信息-->
+    <select id="getEnterpriseInfoListByQryParam" parameterType="com.hanzhong.data.web.model.bo.EnterpriseInfoQryParamBO"
+            resultMap="enterpriseInfoMap">
+        SELECT
+        PRIPID, CREDITCODE,ORGCODE,ENTNAME,REGCAP,REGCAPCUR,ENTTYPE,S_EXT_ENTPROPERTY,ENTSTATUS,OPSCOPE, ESDATE,
+        APPRDATE,ENDDATE,REVDATE,CANDATE,OPFROM,OPTO,NAME,REGORG,DOM,OPLOC,POSTALCODE,DOMDISTRICT,ECOTECDEVZONE,PROVINCE,CITY,AREA
+        FROM tblBusiness
+        <where>
+            <if test="entName != null and entName != ''">
+                AND ENTNAME = #{entName}
+            </if>
+            <if test="usCreditCode != null and usCreditCode != ''">
+                AND CREDITCODE = #{usCreditCode}
+            </if>
+            <if test="orgCode != null and orgCode != ''">
+                AND ORGCODE = #{orgCode}
+            </if>
+            <if test="entStatus != null and entStatus != ''">
+                AND ENTSTATUS = #{entStatus}
+            </if>
+        </where>
+    </select>
+
+
+</mapper>

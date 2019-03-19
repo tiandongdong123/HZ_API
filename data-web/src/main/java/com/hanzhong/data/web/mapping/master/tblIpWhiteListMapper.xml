@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hanzhong.data.web.dao.master.TblIpWhiteListDao">
+    <resultMap id="baseInfoMap" type="com.hanzhong.data.web.model.entity.master.TblIpWhiteListEntity">
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="ip_segment" property="ipSegment" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+        <result column="create_person" property="createPerson" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="DATE"/>
+        <result column="update_person" property="updatePerson" jdbcType="VARCHAR"/>
+        <result column="update_time" property="updateTime" jdbcType="DATE"/>
+    </resultMap>
+
+    <!--获取ip白名单信息-->
+    <select id="getIpWhiteList" parameterType="com.hanzhong.data.web.model.bo.IpWhiteListQryBO"
+            resultMap="baseInfoMap">
+        SELECT
+        id, name,ip_segment,status,remark,create_person,create_time,update_person,update_time
+        FROM tblIpWhiteList
+        <where>
+            <if test="name != null and name != ''">
+                AND name = #{name}
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+        </where>
+    </select>
+
+</mapper>
