@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hanzhong.data.web.dao.slave.LdRegisterInfoDao">
+    <resultMap id="baseInfoMap" type="com.hanzhong.data.web.model.entity.slave.LdRegisterInfoEntity">
+        <id column="ID" property="id" jdbcType="BIGINT"/>
+        <result column="PRIPID" property="pripId" jdbcType="VARCHAR"/>
+        <result column="ENTNAME" property="entName" jdbcType="VARCHAR"/>
+        <result column="OLDNAME" property="oldName" jdbcType="VARCHAR"/>
+        <result column="SHXYDM" property="shxydm" jdbcType="VARCHAR"/>
+        <result column="FRDB" property="frdb" jdbcType="VARCHAR"/>
+        <result column="ESDATE" property="esDate" jdbcType="DATE"/>
+        <result column="ENTSTATUS" property="entStatus" jdbcType="VARCHAR"/>
+        <result column="REGCAP" property="regCap" jdbcType="DECIMAL"/>
+        <result column="REGCAPCUR" property="regCapCur" jdbcType="VARCHAR"/>
+        <result column="DOM" property="dom" jdbcType="VARCHAR"/>
+        <result column="ENTTYPE" property="entType" jdbcType="VARCHAR"/>
+        <result column="OPSCOPE" property="opScope" jdbcType="VARCHAR"/>
+        <result column="REGORG" property="regOrg" jdbcType="VARCHAR"/>
+        <result column="OPFROM" property="opFrom" jdbcType="DATE"/>
+        <result column="OPTO" property="opTo" jdbcType="DATE"/>
+        <result column="APPRDATE" property="apprDate" jdbcType="DATE"/>
+        <result column="ENDDATE" property="endDate" jdbcType="DATE"/>
+        <result column="REVDATE" property="revDate" jdbcType="DATE"/>
+        <result column="CANDATE" property="canDate" jdbcType="DATE"/>
+        <result column="JWD" property="jwd" jdbcType="VARCHAR"/>
+        <result column="INDUSTRY" property="industry" jdbcType="VARCHAR"/>
+        <result column="INDUSTRY_CODE" property="industryCode" jdbcType="VARCHAR"/>
+        <result column="PROVINCE" property="province" jdbcType="VARCHAR"/>
+        <result column="ORGID" property="orgId" jdbcType="VARCHAR"/>
+        <result column="ENGNAME" property="engName" jdbcType="VARCHAR"/>
+        <result column="WEBSITE" property="webSite" jdbcType="VARCHAR"/>
+        <result column="UPDATE_TIME" property="updateTime" jdbcType="BIGINT"/>
+    </resultMap>
+
+    <!--获取企业登记信息-->
+    <select id="getRegisterInfoListByQryParam" parameterType="com.hanzhong.data.web.model.bo.LdRegInfoQryParamBO" resultMap="baseInfoMap">
+        SELECT
+        ID, PRIPID,ENTNAME, OLDNAME, SHXYDM, FRDB, ESDATE, ENTSTATUS, REGCAP, REGCAPCUR, DOM, ENTTYPE, OPSCOPE,
+        REGORG, OPFROM, OPTO, APPRDATE, ENDDATE, REVDATE, CANDATE, JWD, INDUSTRY, INDUSTRY_CODE, PROVINCE, ORGID,
+        ENGNAME, WEBSITE, UPDATE_TIME
+        FROM ld_register_info
+        <where>
+            <if test="entName != null and entName != ''">
+                AND ENTNAME = #{entName}
+            </if>
+            <if test="usCreditCode != null and usCreditCode != ''">
+                AND SHXYDM = #{usCreditCode}
+            </if>
+            <if test="orgCode != null and orgCode != ''">
+                AND ORGID = #{orgCode}
+            </if>
+        </where>
+    </select>
+
+    <!--添加企业登记信息-->
+    <insert id="addRegisterInfo" parameterType="com.hanzhong.data.web.model.entity.slave.LdRegisterInfoEntity">
+        INSERT INTO ld_register_info (
+            PRIPID,
+            ENTNAME,
+            OLDNAME,
+            SHXYDM,
+            FRDB,
+            ESDATE,
+            ENTSTATUS,
+            REGCAP,
+            REGCAPCUR,
+            DOM,
+            ENTTYPE,
+            OPSCOPE,
+            REGORG,
+            OPFROM,
+            OPTO,
+            APPRDATE,
+            ENDDATE,
+            REVDATE,
+            CANDATE,
+            JWD,
+            INDUSTRY,
+            INDUSTRY_CODE,
+            PROVINCE,
+            ORGID,
+            ENGNAME,
+            WEBSITE,
+            UPDATE_TIME
+        ) VALUES (
+            #{pripId},
+            #{entName},
+            #{oldName},
+            #{shxydm},
+            #{frdb},
+            #{esDate},
+            #{entStatus},
+            #{regCap},
+            #{regCapCur},
+            #{dom},
+            #{entType},
+            #{opScope},
+            #{regOrg},
+            #{opFrom},
+            #{opTo},
+            #{apprDate},
+            #{endDate},
+            #{revDate},
+            #{canDate},
+            #{jwd},
+            #{industry},
+            #{industryCode},
+            #{province},
+            #{orgId},
+            #{engName},
+            #{webSite},
+            #{updateTime}
+        )
+    </insert>
+
+    <!--更新企业登记信息-->
+    <update id="updateRegisterInfo" parameterType="com.hanzhong.data.web.model.entity.slave.LdRegisterInfoEntity">
+        UPDATE ld_register_info
+        <set>
+            PRIPID = #{pripId},
+            ENTNAME = #{entName},
+            OLDNAME = #{oldName},
+            SHXYDM = #{shxydm},
+            FRDB = #{frdb},
+            ESDATE = #{esDate},
+            ENTSTATUS = #{entStatus},
+            REGCAP = #{regCap},
+            REGCAPCUR = #{regCapCur},
+            DOM = #{dom},
+            ENTTYPE = #{entType},
+            OPSCOPE = #{opScope},
+            REGORG = #{regOrg},
+            OPFROM = #{opFrom},
+            OPTO = #{opTo},
+            APPRDATE = #{apprDate},
+            ENDDATE = #{endDate},
+            REVDATE = #{revDate},
+            CANDATE = #{canDate},
+            JWD = #{jwd},
+            INDUSTRY = #{industry},
+            INDUSTRY_CODE = #{industryCode},
+            PROVINCE = #{province},
+            ORGID = #{orgId},
+            ENGNAME = #{engName},
+            WEBSITE = #{webSite},
+            UPDATE_TIME = #{updateTime},
+        </set>
+        <where>
+            AND ID = #{id}
+        </where>
+    </update>
+
+</mapper>
