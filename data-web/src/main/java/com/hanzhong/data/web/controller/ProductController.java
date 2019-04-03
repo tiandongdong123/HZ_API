@@ -2,10 +2,11 @@ package com.hanzhong.data.web.controller;
 
 import com.hanzhong.data.web.constant.ProductParamEnum;
 import com.hanzhong.data.web.constant.ResultCodeEnum;
-import com.hanzhong.data.web.model.EnterpriseBaseInfo;
-import com.hanzhong.data.web.model.EnterpriseBaseInfoQryParam;
-import com.hanzhong.data.web.model.JsonResult;
-import com.hanzhong.data.web.model.vo.EnterpriseInfoVO;
+import com.hanzhong.data.web.model.*;
+import com.hanzhong.data.web.model.vo.EntGoodsInfoVO;
+import com.hanzhong.data.web.model.vo.EntInvestAbroadInfoVO;
+import com.hanzhong.data.web.model.vo.EnterpriseBaseInfoVO;
+import com.hanzhong.data.web.model.vo.ListedEntBaseInfoVO;
 import com.hanzhong.data.web.service.BusinessDataService;
 import com.hanzhong.data.web.util.CheckUtils;
 import com.hanzhong.data.web.util.HttpUtils;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  *  
@@ -50,7 +52,7 @@ public class ProductController {
      */
     @PostMapping("/product_companyInfoOut")
     @ResponseBody
-    public JsonResult getCompanyInfo(HttpServletRequest request) {
+    public JsonResult getEntBaseInfo(HttpServletRequest request) {
         // 统一社会信用代码
         String corCodeTy = request.getParameter(ProductParamEnum.COR_CODE_TY.getValue());
         // 组织机构代码
@@ -61,25 +63,28 @@ public class ProductController {
         try {
             // 判断必填参数是否为空
             if (!meetNotBlankRequirement(request, productParam)) {
+                logger.warn("request：【{}】，获取企业信息的必填项参数为空！", HttpUtils.getRequestParamJsonStr(request));
                 return JsonResultUtils.build(ResultCodeEnum.PARAM_EMPTY, null);
             }
 
             // 判断统一社会信用代码格式是否正确
             if (ProductParamEnum.COR_CODE_TY.getValue().equals(productParam) && !CheckUtils.isUnifiedSocialCreditCode(corCodeTy)) {
+                logger.warn("request：【{}】，获取企业信息的统一社会信用代码格式不正确！", HttpUtils.getRequestParamJsonStr(request));
                 return JsonResultUtils.build(ResultCodeEnum.PARAM_FORMAT_ERROR, null);
             }
 
             // 判断组织机构代码格式是否正确
             if (ProductParamEnum.COR_CODE.getValue().equals(productParam) && !CheckUtils.isOrganizationCode(corCode.replace(SMALL_MIDDLE_LINE_SEPARATOR, ""))) {
+                logger.warn("request：【{}】，获取企业信息的组织机构代码格式不正确！", HttpUtils.getRequestParamJsonStr(request));
                 return JsonResultUtils.build(ResultCodeEnum.PARAM_FORMAT_ERROR, null);
             }
 
             // 创建查询参数
             EnterpriseBaseInfoQryParam qryParam = createEntBaseInfoQryParam(request, productParam);
             // 获取企业信息
-            EnterpriseInfoVO enterpriseInfoVO = getEnterpriseInfo(qryParam);
-            if (enterpriseInfoVO != null) {
-                return JsonResultUtils.build(ResultCodeEnum.SUCCESS, enterpriseInfoVO);
+            EnterpriseBaseInfoVO enterpriseBaseInfoVO = getEnterpriseBaseInfo(qryParam);
+            if (enterpriseBaseInfoVO != null) {
+                return JsonResultUtils.build(ResultCodeEnum.SUCCESS, enterpriseBaseInfoVO);
             }
             logger.info("request：【{}】，未获取企业信息", HttpUtils.getRequestParamJsonStr(request));
             return JsonResultUtils.build(ResultCodeEnum.NO_DATA, null);
@@ -101,11 +106,11 @@ public class ProductController {
     }
 
     /**
-     * 创建查询参数
+     * 创建企业基本信息查询参数
      *
      * @param request      请求
      * @param productParam 查询参数类型
-     * @return CompanyQryBO
+     * @return EnterpriseBaseInfoQryParam
      */
     private EnterpriseBaseInfoQryParam createEntBaseInfoQryParam(HttpServletRequest request, String productParam) {
         EnterpriseBaseInfoQryParam qryParam = new EnterpriseBaseInfoQryParam();
@@ -128,77 +133,77 @@ public class ProductController {
      * @param qryParam 企业查询参数
      * @return 若查询不到企业，则返回null
      */
-    private EnterpriseInfoVO getEnterpriseInfo(EnterpriseBaseInfoQryParam qryParam) {
+    private EnterpriseBaseInfoVO getEnterpriseBaseInfo(EnterpriseBaseInfoQryParam qryParam) {
         logger.info("BusinessDataService.getEnterpriseBaseInfo()的参数值：【{}】", qryParam);
         EnterpriseBaseInfo enterpriseBaseInfo = businessDataService.getEnterpriseBaseInfo(qryParam);
         logger.info("BusinessDataService.getEnterpriseBaseInfo()的返回值：【{}】", enterpriseBaseInfo);
-
-        if (enterpriseBaseInfo != null) {
-            // 转换成EnterpriseInfoVO
-            EnterpriseInfoVO infoVO = convertToEnterpriseInfoVO(enterpriseBaseInfo);
-            logger.debug("request：【{}】，转换成EnterpriseInfoVO后结果值：【{}】", enterpriseBaseInfo, infoVO);
-            return infoVO;
+        if (enterpriseBaseInfo == null) {
+            return null;
         }
-        return null;
+
+        // 转换成EnterpriseInfoVO
+        EnterpriseBaseInfoVO infoVO = convertToEnterpriseBaseInfoVO(enterpriseBaseInfo);
+        logger.debug("EnterpriseBaseInfo：【{}】，转换成EnterpriseInfoVO后结果值：【{}】", enterpriseBaseInfo, infoVO);
+        return infoVO;
     }
 
     /**
      * 转换成EnterpriseInfoVO
      *
      * @param enterpriseBaseInfo 企业基本信息
-     * @return EnterpriseInfoVO
+     * @return EnterpriseBaseInfoVO
      */
-    private EnterpriseInfoVO convertToEnterpriseInfoVO(EnterpriseBaseInfo enterpriseBaseInfo) {
-        EnterpriseInfoVO enterpriseInfoVO = new EnterpriseInfoVO();
+    private EnterpriseBaseInfoVO convertToEnterpriseBaseInfoVO(EnterpriseBaseInfo enterpriseBaseInfo) {
+        EnterpriseBaseInfoVO enterpriseBaseInfoVO = new EnterpriseBaseInfoVO();
         // 统一社会信息代码
-        enterpriseInfoVO.setUsCreditCode(enterpriseBaseInfo.getUsCreditCode());
+        enterpriseBaseInfoVO.setUsCreditCode(enterpriseBaseInfo.getUsCreditCode());
         // 组织机构代码
-        enterpriseInfoVO.setOrgCode(enterpriseBaseInfo.getOrgCode());
+        enterpriseBaseInfoVO.setOrgCode(enterpriseBaseInfo.getOrgCode());
         // 企业名称
-        enterpriseInfoVO.setEntName(enterpriseBaseInfo.getEntName());
+        enterpriseBaseInfoVO.setEntName(enterpriseBaseInfo.getEntName());
         // 曾用名
-        enterpriseInfoVO.setUsedName(enterpriseBaseInfo.getUsedName());
+        enterpriseBaseInfoVO.setUsedName(enterpriseBaseInfo.getUsedName());
         // 行业领域
-        enterpriseInfoVO.setIndustry(enterpriseBaseInfo.getIndustry());
+        enterpriseBaseInfoVO.setIndustry(enterpriseBaseInfo.getIndustry());
         // 行业领域代码
-        enterpriseInfoVO.setIndustryCode(enterpriseBaseInfo.getIndustryCode());
+        enterpriseBaseInfoVO.setIndustryCode(enterpriseBaseInfo.getIndustryCode());
         // 注册资金（默认单位：万）
-        enterpriseInfoVO.setRegCap(enterpriseBaseInfo.getRegCap());
+        enterpriseBaseInfoVO.setRegCap(enterpriseBaseInfo.getRegCap());
         // 注册资本(金)币种
-        enterpriseInfoVO.setRegCapCur(enterpriseBaseInfo.getRegCapCur());
+        enterpriseBaseInfoVO.setRegCapCur(enterpriseBaseInfo.getRegCapCur());
         // 企业类型
-        enterpriseInfoVO.setEntType(enterpriseBaseInfo.getEntType());
+        enterpriseBaseInfoVO.setEntType(enterpriseBaseInfo.getEntType());
         // 企业状态
-        enterpriseInfoVO.setEntStatus(enterpriseBaseInfo.getEntStatus());
+        enterpriseBaseInfoVO.setEntStatus(enterpriseBaseInfo.getEntStatus());
         //  经营(业务)范围
-        enterpriseInfoVO.setOpScope(enterpriseBaseInfo.getOpScope());
+        enterpriseBaseInfoVO.setOpScope(enterpriseBaseInfo.getOpScope());
         // 成立日期(格式：yyyy-MM-dd)
-        enterpriseInfoVO.setEsDate(enterpriseBaseInfo.getEsDate());
+        enterpriseBaseInfoVO.setEsDate(enterpriseBaseInfo.getEsDate());
         // 核准日期(格式：yyyy-MM-dd)
-        enterpriseInfoVO.setApprDate(enterpriseBaseInfo.getApprDate());
+        enterpriseBaseInfoVO.setApprDate(enterpriseBaseInfo.getApprDate());
         // 死亡日期(格式：yyyy-MM-dd)
-        enterpriseInfoVO.setEndDate(enterpriseBaseInfo.getEndDate());
+        enterpriseBaseInfoVO.setEndDate(enterpriseBaseInfo.getEndDate());
         // 吊销日期(格式：yyyy-MM-dd)
-        enterpriseInfoVO.setRevDate(enterpriseBaseInfo.getRevDate());
+        enterpriseBaseInfoVO.setRevDate(enterpriseBaseInfo.getRevDate());
         // 注销日期(格式：yyyy-MM-dd)
-        enterpriseInfoVO.setCanDate(enterpriseBaseInfo.getCanDate());
+        enterpriseBaseInfoVO.setCanDate(enterpriseBaseInfo.getCanDate());
         // 经营(驻在)期限自(格式：yyyy-MM-dd)
-        enterpriseInfoVO.setOpFrom(enterpriseBaseInfo.getOpFrom());
+        enterpriseBaseInfoVO.setOpFrom(enterpriseBaseInfo.getOpFrom());
         // 经营(驻在)期限至(格式：yyyy-MM-dd)
-        enterpriseInfoVO.setOpTo(enterpriseBaseInfo.getOpTo());
+        enterpriseBaseInfoVO.setOpTo(enterpriseBaseInfo.getOpTo());
         // 法定代表人
-        enterpriseInfoVO.setName(enterpriseBaseInfo.getName());
+        enterpriseBaseInfoVO.setName(enterpriseBaseInfo.getName());
         // 登记机关
-        enterpriseInfoVO.setRegOrg(enterpriseBaseInfo.getRegOrg());
+        enterpriseBaseInfoVO.setRegOrg(enterpriseBaseInfo.getRegOrg());
         // 邮政编码
-        enterpriseInfoVO.setPostalCode(enterpriseBaseInfo.getPostalCode());
+        enterpriseBaseInfoVO.setPostalCode(enterpriseBaseInfo.getPostalCode());
         // 住所
-        enterpriseInfoVO.setDom(enterpriseBaseInfo.getDom());
+        enterpriseBaseInfoVO.setDom(enterpriseBaseInfo.getDom());
         // 住所行政区划
-        enterpriseInfoVO.setDomDistrict(enterpriseBaseInfo.getDomDistrict());
+        enterpriseBaseInfoVO.setDomDistrict(enterpriseBaseInfo.getDomDistrict());
         // 住所所在经济开发区
-        enterpriseInfoVO.setEcoTecDevZone(enterpriseBaseInfo.getEcoTecDevZone());
-        return enterpriseInfoVO;
+        enterpriseBaseInfoVO.setEcoTecDevZone(enterpriseBaseInfo.getEcoTecDevZone());
+        return enterpriseBaseInfoVO;
     }
 
 }

@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hanzhong.data.web.dao.master.TblStandardDao">
+    <resultMap id="baseResultMap" type="com.hanzhong.data.web.model.entity.master.TblStandardEntity">
+        <id column="ID" property="id" jdbcType="BIGINT"/>
+        <result column="record_status" property="recordStatus" jdbcType="VARCHAR"/>
+        <result column="avoid_info" property="avoidInfo" jdbcType="VARCHAR"/>
+        <result column="stand_status" property="standardStatus" jdbcType="VARCHAR"/>
+        <result column="record_id" property="recordId" jdbcType="VARCHAR"/>
+        <result column="stand_num" property="standardNum" jdbcType="VARCHAR"/>
+        <result column="issue_date" property="issueDate" jdbcType="DATE"/>
+        <result column="issue_unit" property="issueUnit" jdbcType="VARCHAR"/>
+        <result column="force_date" property="forceDate" jdbcType="DATE"/>
+        <result column="confirm_date" property="confirmDate" jdbcType="VARCHAR"/>
+        <result column="ics_code" property="icsCode" jdbcType="VARCHAR"/>
+        <result column="draft_unit" property="draftUnit" jdbcType="VARCHAR"/>
+        <result column="exp_date" property="expDate" jdbcType="VARCHAR"/>
+        <result column="avoid_date" property="avoidDate" jdbcType="VARCHAR"/>
+        <result column="stand_type" property="standardType" jdbcType="VARCHAR"/>
+        <result column="stand_level" property="standardLevel" jdbcType="VARCHAR"/>
+        <result column="stand_name" property="standardName" jdbcType="VARCHAR"/>
+        <result column="language" property="language" jdbcType="VARCHAR"/>
+        <result column="orig_stand_name" property="origStandardName" jdbcType="VARCHAR"/>
+        <result column="en_stand_name" property="enStandardName" jdbcType="VARCHAR"/>
+        <result column="page_cnt" property="pageCount" jdbcType="VARCHAR"/>
+        <result column="is_translation_version" property="isTranslationVersion" jdbcType="VARCHAR"/>
+        <result column="udc_code" property="udcCode" jdbcType="VARCHAR"/>
+        <result column="remarks" property="remarks" jdbcType="VARCHAR"/>
+        <result column="stand_new" property="newStandard" jdbcType="VARCHAR"/>
+        <result column="stand_old" property="oldStandard" jdbcType="VARCHAR"/>
+        <result column="stand_supplement" property="standardSupplement" jdbcType="VARCHAR"/>
+        <result column="stand_citation" property="standardCitation" jdbcType="VARCHAR"/>
+        <result column="stand_adopt" property="standardAdopt" jdbcType="VARCHAR"/>
+        <result column="stand_amendment" property="standardAmendment" jdbcType="VARCHAR"/>
+        <result column="ccs_code" property="cssCode" jdbcType="VARCHAR"/>
+        <result column="keywords" property="keywords" jdbcType="VARCHAR"/>
+        <result column="abstract_zh" property="zhAbstract" jdbcType="VARCHAR"/>
+        <result column="en_keywords" property="enKeywords" jdbcType="VARCHAR"/>
+        <result column="full_keywords" property="fullKeywords" jdbcType="VARCHAR"/>
+        <result column="title" property="title" jdbcType="VARCHAR"/>
+        <result column="req_num" property="reqNum" jdbcType="VARCHAR"/>
+        <result column="corpus_id" property="corpusId" jdbcType="VARCHAR"/>
+        <result column="sort_code" property="sortCode" jdbcType="VARCHAR"/>
+        <result column="pub_org_code" property="pubOrgCode" jdbcType="VARCHAR"/>
+        <result column="source_db" property="sourDb" jdbcType="VARCHAR"/>
+        <result column="class_code" property="classCode" jdbcType="VARCHAR"/>
+        <result column="ccs_code_c" property="cssCodeCollection" jdbcType="VARCHAR"/>
+        <result column="draftsman" property="draftsMan" jdbcType="VARCHAR"/>
+        <result column="PDF" property="pdf" jdbcType="VARCHAR"/>
+        <result column="bat" property="bat" jdbcType="VARCHAR"/>
+        <result column="belong_type" property="belongType" jdbcType="VARCHAR"/>
+        <result column="stand_code_f2" property="f2StandardCode" jdbcType="VARCHAR"/>
+        <result column="stand_num_ys" property="ysStandardCode" jdbcType="VARCHAR"/>
+        <result column="approval_unit" property="approvalUnit" jdbcType="VARCHAR"/>
+        <result column="class_code2" property="classCode2" jdbcType="VARCHAR"/>
+        <result column="pdf_path" property="pdfPath" jdbcType="VARCHAR"/>
+        <result column="stand_num_first" property="firstStandardNum" jdbcType="VARCHAR"/>
+        <result column="pub_literature" property="pubLiterature" jdbcType="VARCHAR"/>
+        <result column="stand_kind" property="standardKind" jdbcType="VARCHAR"/>
+        <result column="class_code_old" property="oldClassCode" jdbcType="VARCHAR"/>
+        <result column="issue_year" property="issueYear" jdbcType="VARCHAR"/>
+        <result column="ys_ccs_code" property="ysCssCode" jdbcType="VARCHAR"/>
+        <result column="avoid_basis" property="avoidBasis" jdbcType="VARCHAR"/>
+        <result column="new_stand_num" property="newStandardNum" jdbcType="VARCHAR"/>
+        <result column="avoid_source" property="avoidSource" jdbcType="VARCHAR"/>
+        <result column="receive_date" property="receiveDate" jdbcType="DATE"/>
+        <result column="WFInstitutionName" property="wfInstitutionName" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="baseColumn">
+      ID,record_status,avoid_info,stand_status,record_id,stand_num,issue_date,issue_unit,force_date,confirm_date,ics_code,
+      draft_unit,exp_date,avoid_date,stand_type,stand_level,stand_name,language,orig_stand_name,en_stand_name,page_cnt,
+      is_translation_version,udc_code,remarks,stand_new,stand_old,stand_supplement,stand_citation,stand_adopt,stand_amendment,
+      ccs_code,keywords,abstract_zh,en_keywords,full_keywords,title,req_num,corpus_id,sort_code,pub_org_code,source_db,
+      class_code,ccs_code_c,draftsman,PDF,bat,belong_type,stand_code_f2,stand_num_ys,approval_unit,class_code2,pdf_path,
+      stand_num_first,pub_literature,stand_kind,class_code_old,issue_year,ys_ccs_code,avoid_basis,new_stand_num,avoid_source,
+      receive_date,WFInstitutionName
+    </sql>
+
+    <sql id="baseRepeatColumn">
+      s.ID,record_status,avoid_info,stand_status,record_id,stand_num,issue_date,issue_unit,force_date,confirm_date,ics_code,
+      draft_unit,exp_date,avoid_date,stand_type,stand_level,stand_name,language,orig_stand_name,en_stand_name,page_cnt,
+      is_translation_version,udc_code,remarks,stand_new,stand_old,stand_supplement,stand_citation,stand_adopt,stand_amendment,
+      ccs_code,keywords,abstract_zh,en_keywords,full_keywords,title,req_num,corpus_id,sort_code,pub_org_code,source_db,
+      class_code,ccs_code_c,draftsman,PDF,bat,belong_type,stand_code_f2,stand_num_ys,approval_unit,class_code2,pdf_path,
+      stand_num_first,pub_literature,stand_kind,class_code_old,issue_year,ys_ccs_code,avoid_basis,new_stand_num,avoid_source,
+      receive_date,WFInstitutionName
+    </sql>
+
+    <!--获取标准信息总数-->
+    <select id="getStandardInfoCount" parameterType="com.hanzhong.data.web.model.bo.StandardInfoQryBO"
+            resultType="java.lang.Integer">
+        SELECT
+        COUNT(ID)
+        FROM tblstandard
+        <where>
+            <if test="standardNum != null and standardNum != ''">
+                AND stand_num = #{standardNum}
+            </if>
+        </where>
+    </select>
+
+    <!--获取标准信息-->
+    <select id="getStandardInfoList" parameterType="com.hanzhong.data.web.model.bo.StandardInfoQryBO"
+            resultMap="baseResultMap">
+        SELECT
+        <include refid="baseColumn"></include>
+        FROM tblstandard
+        <where>
+            <if test="standardNum != null and standardNum != ''">
+                AND stand_num = #{standardNum}
+            </if>
+        </where>
+        LIMIT #{startIndex},#{pageSize}
+    </select>
+
+    <!--获取企业标准信息总数-->
+    <select id="getEntStandardInfoCount" parameterType="com.hanzhong.data.web.model.bo.EntStandardInfoQryBO"
+            resultType="java.lang.Integer">
+        SELECT
+        COUNT(s.ID)
+        FROM tblstandard s,tblstandardresult_new r
+        <where>
+            <if test="pripId != null and pripId != ''">
+                AND PRIPID = #{pripId}
+            </if>
+            <if test="entName != null and entName != ''">
+                AND r.ENTNAME = #{entName}
+            </if>
+            AND s.stand_num = r.RESULT_NUM
+        </where>
+    </select>
+
+    <!--获取企业标准信息-->
+    <select id="getEntStandardInfoList" parameterType="com.hanzhong.data.web.model.bo.EntStandardInfoQryBO"
+            resultMap="baseResultMap">
+        SELECT
+        <include refid="baseRepeatColumn"></include>
+        FROM tblstandard s,tblstandardresult_new r
+        <where>
+            <if test="pripId != null and pripId != ''">
+                AND PRIPID = #{pripId}
+            </if>
+            <if test="entName != null and entName != ''">
+                AND r.ENTNAME = #{entName}
+            </if>
+            AND s.stand_num = r.RESULT_NUM
+        </where>
+        LIMIT #{startIndex},#{pageSize}
+    </select>
+
+
+</mapper>

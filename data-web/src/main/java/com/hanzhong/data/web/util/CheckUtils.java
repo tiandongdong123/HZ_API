@@ -1,7 +1,9 @@
 package com.hanzhong.data.web.util;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.formula.functions.T;
 
+import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -29,35 +31,43 @@ public class CheckUtils {
      * 正则表达式：ip
      */
     private static final Pattern IP_PATTERN = Pattern.compile("^(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|[1-9])\\.(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|\\d)\\.(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|\\d)\\.(1\\d{2}|2[0-4]\\d|25[0-5]|[1-9]\\d|\\d)$");
-
+    /**
+     * 正则表达式：时间格式
+     */
+    private static final Pattern DATETIME_PATTERN = Pattern.compile("^\\d{4}-[0-1]\\d-[0-3]\\d [0-2]\\d:[0-5]\\d:[0-5]\\d$");
 
     private CheckUtils() {
     }
 
     /**
-     * 判断是否存在空
+     * 判断是否空List
      *
-     * @param params 参数集
-     * @return boolean
+     * @param objectList List
+     * @return boolean true:List为空
      */
-    public static boolean isBlank(String... params) {
-        for (String param : params) {
-            if (StringUtils.isBlank(param)) {
-                return true;
-            }
-        }
-        return false;
+    public static boolean isBlankList(List objectList) {
+        return objectList == null || objectList.isEmpty();
     }
 
     /**
-     * 判断是否全为空
+     * 判断是否非空List
+     *
+     * @param objectList List
+     * @return boolean true:List为非空
+     */
+    public static boolean isNotBlankList(List objectList) {
+        return !isBlankList(objectList);
+    }
+
+    /**
+     * 判断是否全为时间格式（yyyy-MM-dd HH:mm:ss）
      *
      * @param params 参数集
-     * @return boolean
+     * @return boolean true：全为时间格式
      */
-    public static boolean isAllBlank(String... params) {
+    public static boolean isAllDateTimeFormat(String... params) {
         for (String param : params) {
-            if (StringUtils.isNotBlank(param)) {
+            if (!DATETIME_PATTERN.matcher(param).matches()) {
                 return false;
             }
         }
@@ -65,18 +75,18 @@ public class CheckUtils {
     }
 
     /**
-     * 判断是否存在空
+     * 判断是否全为数字
      *
      * @param params 参数集
-     * @return boolean
+     * @return boolean true：全是数字
      */
-    public static boolean isEmpty(String... params) {
+    public static boolean isAllNumber(String... params) {
         for (String param : params) {
-            if (StringUtils.isEmpty(param)) {
-                return true;
+            if (!StringUtils.isNumeric(param)) {
+                return false;
             }
         }
-        return false;
+        return true;
     }
 
     /**

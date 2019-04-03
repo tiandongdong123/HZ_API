@@ -7,12 +7,11 @@ import com.hanzhong.data.web.model.ChangeDataPackageInfoQryParam;
 import com.hanzhong.data.web.model.JsonResult;
 import com.hanzhong.data.web.model.vo.ChangeDataPkgInfoVO;
 import com.hanzhong.data.web.service.LdDataService;
-import com.hanzhong.data.web.util.DateUtils;
-import com.hanzhong.data.web.util.HttpUtils;
-import com.hanzhong.data.web.util.JsonResultUtils;
-import com.hanzhong.data.web.util.ObjectUtils;
-import com.hanzhong.data.web.util.longdun.LdApiUtils;
+import com.hanzhong.data.web.util.*;
+import com.hanzhong.data.web.util.longdun.base.LdApiUtils;
+import com.hanzhong.data.web.util.longdun.datapackageinfo.LdDataPackageInfoApiUtils;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -69,7 +68,7 @@ public class LdDataController {
             httpSession.setAttribute(BRIER_PERMISSION_CODE_KEY, permissionCode);
             httpSession.setMaxInactiveInterval(PERMISSION_CODE_VALID_TIME);
             // 设置返回值
-            Map dataMap = new HashMap(1);
+            Map<String, String> dataMap = new HashMap<>(1);
             dataMap.put(BRIER_PERMISSION_CODE_KEY, permissionCode);
             return JsonResultUtils.build(ResultCodeEnum.SUCCESS, dataMap);
         } catch (Exception e) {
@@ -96,10 +95,12 @@ public class LdDataController {
         try {
             // 创建更新数据包信息查询参数
             ChangeDataPackageInfoQryParam infoQryParam = createChangeDataPackageInfoQryParam(request);
+
             // 获取变更数据包
             logger.info("LdDataService.getChangeDataPackageList()的参数值：【{}】", infoQryParam);
             List<ChangeDataPackageInfo> packageInfoList = ldDataService.getChangeDataPackageList(infoQryParam);
             logger.info("LdDataService.getChangeDataPackageList()的返回值：【{}】", packageInfoList);
+
             // 转换成List<ChangeDataPkgInfoVO>
             List<ChangeDataPkgInfoVO> pkgInfoVOList = convertToDataPackageList(packageInfoList);
             logger.debug("转换成List<ChangeDataPkgInfoVO>的结果值：【{}】", packageInfoList);
@@ -119,18 +120,28 @@ public class LdDataController {
     @PostMapping("/monitor_data_package_finish")
     @ResponseBody
     public JsonResult monitorDataPackageFinish(HttpServletRequest request) {
+        // 数据包id
+        String dataPackId = request.getParameter("dataPackId");
+
+        // 判断必填参数是否为空
+        if (StringUtils.isAnyBlank(dataPackId)) {
+            logger.warn("request：【{}】，变更数据包回馈状态的必填项参数为空！", HttpUtils.getRequestParamJsonStr(request));
+            return JsonResultUtils.build(ResultCodeEnum.PARAM_EMPTY, null);
+        }
+
         // 校验权限码
         if (!checkPermissionCode(request)) {
-            logger.warn("request：【{}】，权限码校验未通过", HttpUtils.getRequestParamJsonStr(request));
+            logger.warn("request：【{}】，变更数据包回馈状态权限码校验未通过", HttpUtils.getRequestParamJsonStr(request));
             return JsonResultUtils.build(ResultCodeEnum.NO_PERMISSION, "权限码失效或不正确，请重新获取!");
         }
 
         try {
-            // 数据包id
-            String dataPackId = request.getParameter("dataPackId");
             // 变更数据包回馈状态
             boolean monitorFlag = ldDataService.monitorDataPackageFinish(dataPackId);
-            return JsonResultUtils.build(ResultCodeEnum.SUCCESS, monitorFlag);
+            // 设置返回值
+            Map dataMap = new HashMap(1);
+            dataMap.put("monitorFlag", monitorFlag);
+            return JsonResultUtils.build(ResultCodeEnum.SUCCESS, dataMap);
         } catch (Exception e) {
             logger.error("request：【{}】，变更数据包回馈状态出现异常：", HttpUtils.getRequestParamJsonStr(request), e);
             return JsonResultUtils.build(ResultCodeEnum.SYSTEM_ERROR, null);
@@ -172,8 +183,7 @@ public class LdDataController {
      */
     private DataPackageStatusEnum getDataPackageStatusEnumByCode(String code) {
         DataPackageStatusEnum[] statusEnums = DataPackageStatusEnum.values();
-        for (int i = 0; i < statusEnums.length; i++) {
-            DataPackageStatusEnum statusEnum = statusEnums[i];
+        for (DataPackageStatusEnum statusEnum : statusEnums) {
             if (statusEnum.getValue().equals(code)) {
                 return statusEnum;
             }
@@ -210,7 +220,7 @@ public class LdDataController {
             BigDecimal fileSize = new BigDecimal(packageInfo.getFileSize() == null ? 0 : packageInfo.getFileSize());
             pkgInfoVO.setFileSize(fileSize.divide(new BigDecimal(1024 * 1024), 2, RoundingMode.HALF_UP).toString() + "M");
             // 下载url
-            pkgInfoVO.setDownloadUrl(LdApiUtils.CHANGE_DATA_PACKAGE_DOWNLOAD_URL + "/" + LdApiUtils.U_ID + "/" + packageInfo.getDataPackName());
+            pkgInfoVO.setDownloadUrl(LdDataPackageInfoApiUtils.CHANGE_DATA_PACKAGE_DOWNLOAD_URL + "/" + LdApiUtils.U_ID + "/" + packageInfo.getDataPackName());
             dataPkgInfoVOList.add(pkgInfoVO);
         }
         // 排序

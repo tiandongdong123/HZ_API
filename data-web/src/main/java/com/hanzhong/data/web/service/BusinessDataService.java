@@ -1,7 +1,8 @@
 package com.hanzhong.data.web.service;
 
-import com.hanzhong.data.web.model.EnterpriseBaseInfo;
-import com.hanzhong.data.web.model.EnterpriseBaseInfoQryParam;
+import com.hanzhong.data.web.model.*;
+
+import java.util.List;
 
 /**
  *  
@@ -15,7 +16,7 @@ public interface BusinessDataService {
     /**
      * 获取企业基本信息
      *
-     * @param qryParam 参数
+     * @param qryParam 查询参数
      * @return EnterpriseBaseInfo
      */
     EnterpriseBaseInfo getEnterpriseBaseInfo(EnterpriseBaseInfoQryParam qryParam);
