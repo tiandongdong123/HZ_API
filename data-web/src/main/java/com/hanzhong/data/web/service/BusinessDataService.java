@@ -1,8 +1,7 @@
 package com.hanzhong.data.web.service;
 
-import com.hanzhong.data.web.model.*;
-
-import java.util.List;
+import com.hanzhong.data.web.model.EnterpriseBaseInfo;
+import com.hanzhong.data.web.model.EnterpriseBaseInfoQryParam;
 
 /**
  *  

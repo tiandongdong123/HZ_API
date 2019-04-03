@@ -2,11 +2,10 @@ package com.hanzhong.data.web.controller;
 
 import com.hanzhong.data.web.constant.ProductParamEnum;
 import com.hanzhong.data.web.constant.ResultCodeEnum;
-import com.hanzhong.data.web.model.*;
-import com.hanzhong.data.web.model.vo.EntGoodsInfoVO;
-import com.hanzhong.data.web.model.vo.EntInvestAbroadInfoVO;
+import com.hanzhong.data.web.model.EnterpriseBaseInfo;
+import com.hanzhong.data.web.model.EnterpriseBaseInfoQryParam;
+import com.hanzhong.data.web.model.JsonResult;
 import com.hanzhong.data.web.model.vo.EnterpriseBaseInfoVO;
-import com.hanzhong.data.web.model.vo.ListedEntBaseInfoVO;
 import com.hanzhong.data.web.service.BusinessDataService;
 import com.hanzhong.data.web.util.CheckUtils;
 import com.hanzhong.data.web.util.HttpUtils;
@@ -21,7 +20,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 /**
  *  

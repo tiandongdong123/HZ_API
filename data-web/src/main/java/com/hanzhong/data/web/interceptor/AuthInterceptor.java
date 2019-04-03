@@ -33,17 +33,17 @@ public class AuthInterceptor extends HandlerInterceptorAdapter {
         // ip
         String ip = IpUtils.getIp(request);
 
-//        if (IpAuthUtils.isAuthIp(ip)) {
-//            ipVisitLogger.info("ip：【{}】正常访问", ip);
+        if (IpAuthUtils.isAuthIp(ip)) {
+            ipVisitLogger.info("ip：【{}】正常访问", ip);
             return true;
-//        } else {
-//            ipVisitLogger.warn("ip：【{}】不在ip白名单内，拒绝访问", ip);
-//            response.setContentType("text/plain;charset=UTF-8");
-//            response.setCharacterEncoding("UTF-8");
-//            PrintWriter printWriter = response.getWriter();
-//            printWriter.write(JSON.toJSONString(JsonResultUtils.build(ResultCodeEnum.IP_NOT_BIND, null)));
-//            return false;
-//        }
+        } else {
+            ipVisitLogger.warn("ip：【{}】不在ip白名单内，拒绝访问", ip);
+            response.setContentType("text/plain;charset=UTF-8");
+            response.setCharacterEncoding("UTF-8");
+            PrintWriter printWriter = response.getWriter();
+            printWriter.write(JSON.toJSONString(JsonResultUtils.build(ResultCodeEnum.IP_NOT_BIND, null)));
+            return false;
+        }
     }
 
     @Override
