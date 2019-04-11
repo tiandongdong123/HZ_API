@@ -262,7 +262,7 @@ public class LdDataController {
         HttpSession httpSession = request.getSession();
         String sessionCode = ObjectUtils.defaultString(httpSession.getAttribute(BRIER_PERMISSION_CODE_KEY));
         String requestCode = request.getParameter(BRIER_PERMISSION_CODE_KEY);
-        boolean checkFlag = sessionCode.equals(requestCode);
+        boolean checkFlag = StringUtils.isNotBlank(requestCode) && sessionCode.equals(requestCode);
         logger.debug("session中的权限码：【{}】，请求中的权限码：【{}】,校验结果：【{}】", sessionCode, requestCode, checkFlag);
         return checkFlag;
     }

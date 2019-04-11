@@ -323,6 +323,8 @@ public class EntIntellectualPropertyController {
         standardInfoVO.setIssueDate(entStandardInfo.getIssueDate());
         // 实施日期，格式：yyyy-MM-dd
         standardInfoVO.setForceDate(entStandardInfo.getForceDate());
+        // 替代标准
+        standardInfoVO.setOldStandard(entStandardInfo.getOldStandard());
         // 废止日期，格式：yyyy-MM-dd
         standardInfoVO.setAvoidDate(entStandardInfo.getAvoidDate());
         return standardInfoVO;

@@ -48,7 +48,11 @@ public class EntStandardInfo {
      */
     private String forceDate;
     /**
-     * 废止日期
+     * 替代标准
+     */
+    private String oldStandard;
+    /**
+     * 废止日期，格式：yyyy-MM-dd
      */
     private String avoidDate;
 
@@ -132,6 +136,14 @@ public class EntStandardInfo {
         this.forceDate = forceDate;
     }
 
+    public String getOldStandard() {
+        return oldStandard;
+    }
+
+    public void setOldStandard(String oldStandard) {
+        this.oldStandard = oldStandard;
+    }
+
     public String getAvoidDate() {
         return avoidDate;
     }
@@ -153,6 +165,7 @@ public class EntStandardInfo {
                 ", draftUnit='" + draftUnit + '\'' +
                 ", issueDate='" + issueDate + '\'' +
                 ", forceDate='" + forceDate + '\'' +
+                ", oldStandard='" + oldStandard + '\'' +
                 ", avoidDate='" + avoidDate + '\'' +
                 '}';
     }

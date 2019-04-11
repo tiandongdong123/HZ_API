@@ -560,6 +560,8 @@ public class EntIntellectualPropertyServiceImpl implements EntIntellectualProper
         standardInfo.setIssueDate(DateUtils.dateFormat(tblStandardEntity.getIssueDate(), DateUtils.DEFAULT_DATE_FORMAT));
         // 实施日期，格式：yyyy-MM-dd
         standardInfo.setForceDate(DateUtils.dateFormat(tblStandardEntity.getForceDate(), DateUtils.DEFAULT_DATE_FORMAT));
+        // 替代标准
+        standardInfo.setOldStandard(tblStandardEntity.getOldStandard());
         // 废止日期，格式：yyyy-MM-dd
         standardInfo.setAvoidDate(tblStandardEntity.getAvoidDate());
         return standardInfo;
