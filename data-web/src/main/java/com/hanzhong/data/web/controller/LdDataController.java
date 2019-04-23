@@ -28,7 +28,7 @@ import java.util.*;
 
 /**
  *  
- *  @Description
+ *  @Description 龙盾数据
  *  @Author   luqs   
  *  @Date 2019/2/21 13:26 
  *  @Version  V1.0   
@@ -139,7 +139,7 @@ public class LdDataController {
             // 变更数据包回馈状态
             boolean monitorFlag = ldDataService.monitorDataPackageFinish(dataPackId);
             // 设置返回值
-            Map dataMap = new HashMap(1);
+            Map<String, Object> dataMap = new HashMap<>(1);
             dataMap.put("monitorFlag", monitorFlag);
             return JsonResultUtils.build(ResultCodeEnum.SUCCESS, dataMap);
         } catch (Exception e) {

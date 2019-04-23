@@ -27,12 +27,12 @@ import java.util.List;
  *  @Date 2019/1/3 16:27 
  *  @Version  V1.0   
  */
-public class ProductControllerTest {
+public class EntBaseInfoControllerTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(ProductControllerTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(EntBaseInfoControllerTest.class);
 
     @Test
-    public void getCompanyInfoTest() {
+    public void getEntBaseInfoTest() {
         // httpClient
         HttpClient httpClient = HttpClients.createDefault();
         // post method

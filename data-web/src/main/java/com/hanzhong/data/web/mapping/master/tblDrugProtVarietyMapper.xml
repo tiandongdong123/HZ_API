@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hanzhong.data.web.dao.master.TblDrugPrtcVarietyDao">
+    <resultMap id="baseResultMap" type="com.hanzhong.data.web.model.entity.master.TblDrugPrtcVarietyEntity">
+        <id column="ID" property="id" jdbcType="BIGINT"/>
+        <result column="PRIPID" property="pripId" jdbcType="VARCHAR"/>
+        <result column="variety_id" property="varietyId" jdbcType="VARCHAR"/>
+        <result column="drug_name" property="drugName" jdbcType="VARCHAR"/>
+        <result column="pub_num" property="pubNum" jdbcType="VARCHAR"/>
+        <result column="aprv_num" property="aprvNum" jdbcType="VARCHAR"/>
+        <result column="level" property="level" jdbcType="INTEGER"/>
+        <result column="spec" property="spec" jdbcType="VARCHAR"/>
+        <result column="start_date" property="startDate" jdbcType="DATE"/>
+        <result column="end_date" property="endDate" jdbcType="DATE"/>
+        <result column="mfrs_ent" property="mfrsEnt" jdbcType="VARCHAR"/>
+        <result column="dosage_form" property="dosageForm" jdbcType="VARCHAR"/>
+        <result column="limit_time" property="limitTime" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="baseColumn">
+      ID,PRIPID,variety_id,drug_name,pub_num,aprv_num,level,spec,start_date,end_date,mfrs_ent,dosage_form,limit_time
+    </sql>
+
+    <!--获取医药保护品种信息总数-->
+    <select id="getDrugPrtcVarietyInfoCount" parameterType="com.hanzhong.data.web.model.bo.DrugProtVarietyInfoQryBO"
+            resultType="java.lang.Integer">
+        SELECT
+        COUNT(ID)
+        FROM tbldrug_prtcvariety
+        <where>
+            <if test="varietyId != null and varietyId != ''">
+                AND variety_id = #{varietyId}
+            </if>
+        </where>
+    </select>
+
+    <!--获取医药保护品种信息-->
+    <select id="getDrugPrtcVarietyInfoList" parameterType="com.hanzhong.data.web.model.bo.DrugProtVarietyInfoQryBO"
+            resultMap="baseResultMap">
+        SELECT
+        <include refid="baseColumn"></include>
+        FROM tbldrug_prtcvariety
+        <where>
+            <if test="varietyId != null and varietyId != ''">
+                AND variety_id = #{varietyId}
+            </if>
+        </where>
+        LIMIT #{startIndex},#{pageSize}
+    </select>
+
+    <!--获取企业医药保护品种信息总数-->
+    <select id="getEntDrugPrtcVarietyInfoCount"
+            parameterType="com.hanzhong.data.web.model.bo.EntDrugProtVarietyInfoQryBO"
+            resultType="java.lang.Integer">
+        SELECT
+        COUNT(ID)
+        FROM tbldrug_prtcvariety
+        <where>
+            <if test="pripId != null and pripId != ''">
+                AND PRIPID = #{pripId}
+            </if>
+            <if test="entName != null and entName != ''">
+                AND mfrs_ent = #{entName}
+            </if>
+        </where>
+    </select>
+
+    <!--获取企业医药保护品种信息-->
+    <select id="getEntDrugPrtcVarietyInfoList"
+            parameterType="com.hanzhong.data.web.model.bo.EntDrugProtVarietyInfoQryBO"
+            resultMap="baseResultMap">
+        SELECT
+        <include refid="baseColumn"></include>
+        FROM tbldrug_prtcvariety
+        <where>
+            <if test="pripId != null and pripId != ''">
+                AND PRIPID = #{pripId}
+            </if>
+            <if test="entName != null and entName != ''">
+                AND mfrs_ent = #{entName}
+            </if>
+        </where>
+        LIMIT #{startIndex},#{pageSize}
+    </select>
+
+</mapper>

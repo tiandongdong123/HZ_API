@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hanzhong.data.web.dao.master.HighTechInfoDao">
+    <resultMap id="baseInfoMap" type="com.hanzhong.data.web.model.entity.master.HighTechEntInfoEntity">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="ent_name" property="entName" jdbcType="VARCHAR"/>
+        <result column="us_credit_code" property="usCreditCode" jdbcType="VARCHAR"/>
+        <result column="update_time" property="updateTime" jdbcType="BIGINT"/>
+    </resultMap>
+
+    <sql id="baseColumn">
+        id,ent_name,us_credit_code,update_time
+    </sql>
+
+    <!--获取高新企业信息-->
+    <select id="getHighTechInfoList" parameterType="com.hanzhong.data.web.model.bo.HighTechEntQryBO"
+            resultMap="baseInfoMap">
+        SELECT
+        <include refid="baseColumn"></include>
+        FROM high_tech_ent_info
+        <where>
+            <if test="entName != null and entName != ''">
+                AND ent_name = #{entName}
+            </if>
+            <if test="usCreditCode != null and usCreditCode != ''">
+                AND us_credit_code = #{usCreditCode}
+            </if>
+        </where>
+    </select>
+
+    <!--更新高新企业信息-->
+    <update id="updateHighTechInfo" parameterType="com.hanzhong.data.web.model.entity.master.HighTechEntInfoEntity">
+        UPDATE high_tech_ent_info
+        <set>
+            ent_name = #{entName},
+            us_credit_code = #{usCreditCode},
+            update_time = #{updateTime},
+        </set>
+        <where>
+            <if test="usCreditCode != null and usCreditCode != ''">
+                AND us_credit_code = #{usCreditCode}
+            </if>
+            <if test="(usCreditCode == null or usCreditCode == '') and entName != null and entName != ''">
+                AND ent_name = #{entName}
+            </if>
+        </where>
+    </update>
+
+    <!--插入高新企业信息-->
+    <insert id="insertHighTechInfo" parameterType="com.hanzhong.data.web.model.entity.master.HighTechEntInfoEntity">
+        INSERT INTO high_tech_ent_info (
+            ent_name,
+            us_credit_code,
+            update_time
+        ) VALUES (
+            #{entName},
+            #{usCreditCode},
+            #{updateTime}
+        )
+    </insert>
+
+</mapper>

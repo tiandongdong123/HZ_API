@@ -5,9 +5,12 @@ import com.hanzhong.data.web.model.vo.BasePageVO;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Collection;
 import java.util.regex.Pattern;
 
 /**
+ * 业务处理工具类
+ *
  * @author yifei
  * @date 2019/3/21
  */
@@ -167,6 +170,36 @@ public class BusinessHandlingUtils {
             return dateStr.replace(SEPARATOR_DOT, SEPARATOR_MIDDLE_LINE);
         }
         return defaultValue;
+    }
+
+    /**
+     * 是否空集合
+     *
+     * @param collection 集合
+     * @return boolean true：空集合
+     */
+    public static boolean isBlankCollection(Collection collection) {
+        return collection == null || collection.isEmpty();
+    }
+
+    /**
+     * 是否非空集合
+     *
+     * @param collection 集合
+     * @return boolean true：非空集合
+     */
+    public static boolean isNotBlankCollection(Collection collection) {
+        return !isBlankCollection(collection);
+    }
+
+    /**
+     * 获取默认集合长度
+     *
+     * @param collection 集合
+     * @return int
+     */
+    public static int getDefaultCollectionSize(Collection collection) {
+        return collection == null ? 0 : collection.size();
     }
 
     /**

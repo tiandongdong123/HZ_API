@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hanzhong.data.web.dao.master.TblDrugDao">
+    <resultMap id="baseResultMap" type="com.hanzhong.data.web.model.entity.master.TblDrugEntity">
+        <id column="ID" property="id" jdbcType="BIGINT"/>
+        <result column="PRIPID" property="pripId" jdbcType="VARCHAR"/>
+        <result column="APRVNUM" property="aprvNum" jdbcType="VARCHAR"/>
+        <result column="PRODNAME" property="prodName" jdbcType="VARCHAR"/>
+        <result column="ENGNAME" property="engName" jdbcType="VARCHAR"/>
+        <result column="DOSAGE_FORM" property="dosageForm" jdbcType="VARCHAR"/>
+        <result column="SPEC" property="spec" jdbcType="VARCHAR"/>
+        <result column="ENTNAME" property="entName" jdbcType="VARCHAR"/>
+        <result column="OPLOC" property="opLoc" jdbcType="VARCHAR"/>
+        <result column="PRODCATG" property="prodCatg" jdbcType="VARCHAR"/>
+        <result column="APRVDATE" property="aprvDate" jdbcType="VARCHAR"/>
+        <result column="ORIG_APRVNUM" property="origAprvNum" jdbcType="VARCHAR"/>
+        <result column="STDCODE" property="stdCode" jdbcType="VARCHAR"/>
+        <result column="STDDESC" property="stdDesc" jdbcType="VARCHAR"/>
+        <result column="DETLLINK" property="detlLink" jdbcType="VARCHAR"/>
+        <result column="updated_at" property="updatedAt" jdbcType="DATE"/>
+    </resultMap>
+
+    <sql id="baseColumn">
+      ID,PRIPID,APRVNUM,PRODNAME,ENGNAME,DOSAGE_FORM,SPEC,ENTNAME,OPLOC,PRODCATG,APRVDATE,ORIG_APRVNUM,STDCODE,STDDESC,
+      DETLLINK,updated_at
+    </sql>
+
+    <!--获取药品信息总数-->
+    <select id="getDrugInfoCount" parameterType="com.hanzhong.data.web.model.bo.DrugInfoQryBO"
+            resultType="java.lang.Integer">
+        SELECT
+        COUNT(ID)
+        FROM tbldrug
+        <where>
+            <if test="apprNum != null and apprNum != ''">
+                AND APRVNUM = #{apprNum}
+            </if>
+        </where>
+    </select>
+
+    <!--获取药品信息-->
+    <select id="getDrugInfoList" parameterType="com.hanzhong.data.web.model.bo.DrugInfoQryBO"
+            resultMap="baseResultMap">
+        SELECT
+        <include refid="baseColumn"></include>
+        FROM tbldrug
+        <where>
+            <if test="apprNum != null and apprNum != ''">
+                AND APRVNUM = #{apprNum}
+            </if>
+        </where>
+        LIMIT #{startIndex},#{pageSize}
+    </select>
+
+    <!--获取企业药品信息总数-->
+    <select id="getEntDrugInfoCount" parameterType="com.hanzhong.data.web.model.bo.EntDrugInfoQryBO"
+            resultType="java.lang.Integer">
+        SELECT
+        COUNT(ID)
+        FROM tbldrug
+        <where>
+            <if test="pripId != null and pripId != ''">
+                AND PRIPID = #{pripId}
+            </if>
+            <if test="entName != null and entName != ''">
+                AND ENTNAME = #{entName}
+            </if>
+        </where>
+    </select>
+
+    <!--获取企业药品信息-->
+    <select id="getEntDrugInfoList" parameterType="com.hanzhong.data.web.model.bo.EntDrugInfoQryBO"
+            resultMap="baseResultMap">
+        SELECT
+        <include refid="baseColumn"></include>
+        FROM tbldrug
+        <where>
+            <if test="pripId != null and pripId != ''">
+                AND PRIPID = #{pripId}
+            </if>
+            <if test="entName != null and entName != ''">
+                AND ENTNAME = #{entName}
+            </if>
+        </where>
+        LIMIT #{startIndex},#{pageSize}
+    </select>
+
+</mapper>

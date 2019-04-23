@@ -23,16 +23,16 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  *  
- *  @Description
+ *  @Description 企业基本信息
  *  @Author   luqs   
  *  @Date 2018/11/5 16:29 
  *  @Version  V1.0   
  */
 @Controller
 @RequestMapping("/productOutInterface")
-public class ProductController {
+public class EntBaseInfoController {
 
-    private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
+    private static final Logger logger = LoggerFactory.getLogger(EntBaseInfoController.class);
 
     /**
      * 分隔符-“-”
