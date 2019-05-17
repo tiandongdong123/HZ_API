@@ -43,8 +43,7 @@ public class DateUtils {
      * @return String
      */
     public static String dateFormat(Date date) {
-        SimpleDateFormat sdf = new SimpleDateFormat(DEFAULT_DATETIME_FORMAT);
-        return sdf.format(date);
+        return dateFormat(date, DEFAULT_DATETIME_FORMAT);
     }
 
     /**
@@ -52,11 +51,25 @@ public class DateUtils {
      *
      * @param date       日期
      * @param dateFormat 时间格式
-     * @return
+     * @return String 若date为null,则返回null
      */
     public static String dateFormat(Date date, String dateFormat) {
+        if (date == null) {
+            return null;
+        }
+
         SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
         return sdf.format(date);
+    }
+
+    /**
+     * 格式化时间
+     *
+     * @param date 时间
+     * @return String
+     */
+    private String dateFormatIfBlank(Date date) {
+        return date == null ? null : DateUtils.dateFormat(date, DateUtils.DEFAULT_DATE_FORMAT);
     }
 
     /**

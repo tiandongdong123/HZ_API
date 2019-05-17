@@ -47,7 +47,9 @@ public class IpWhiteListServiceImpl implements IpWhiteListService {
     private List<IpWhiteList> getNormalIpWhiteList() {
         IpWhiteListQryBO listQryBO = new IpWhiteListQryBO();
         listQryBO.setStatus(IpStatusEnum.NORMAL.getKey());
+        logger.debug("TblIpWhiteListDao.getIpWhiteList()的参数值：【{}】", listQryBO);
         List<TblIpWhiteListEntity> ipWhiteListEntityList = tblIpWhiteListDao.getIpWhiteList(listQryBO);
+        logger.debug("TblIpWhiteListDao.getIpWhiteList()的返回值：【{}】", ipWhiteListEntityList);
 
         List<IpWhiteList> ipWhiteLists = new ArrayList<>();
         boolean rightIpSegmentFlag;

@@ -31,13 +31,21 @@
         <result column="AREA" property="area" jdbcType="INTEGER"/>
     </resultMap>
 
+    <resultMap id="entUniqueInfoMap" type="com.hanzhong.data.web.model.bo.EntUniqueInfoBO">
+        <result column="PRIPID" property="pripId" jdbcType="VARCHAR"/>
+        <result column="CREDITCODE" property="usCreditCode" jdbcType="VARCHAR"/>
+        <result column="ORGCODE" property="orgCode" jdbcType="VARCHAR"/>
+        <result column="ENTNAME" property="entName" jdbcType="VARCHAR"/>
+        <result column="ENTSTATUS" property="entStatus" jdbcType="VARCHAR"/>
+    </resultMap>
+
     <!--获取企业信息-->
-    <select id="getEnterpriseInfoListByQryParam" parameterType="com.hanzhong.data.web.model.bo.EnterpriseInfoQryParamBO"
+    <select id="getEnterpriseInfoListByQryParam" parameterType="com.hanzhong.data.web.model.bo.EnterpriseInfoQryBO"
             resultMap="enterpriseInfoMap">
         SELECT
         PRIPID, CREDITCODE,ORGCODE,ENTNAME,REGCAP,REGCAPCUR,ENTTYPE,S_EXT_ENTPROPERTY,ENTSTATUS,OPSCOPE, ESDATE,
         APPRDATE,ENDDATE,REVDATE,CANDATE,OPFROM,OPTO,NAME,REGORG,DOM,OPLOC,POSTALCODE,DOMDISTRICT,ECOTECDEVZONE,PROVINCE,CITY,AREA
-        FROM tblBusiness
+        FROM tblbusiness
         <where>
             <if test="entName != null and entName != ''">
                 AND ENTNAME = #{entName}
@@ -54,5 +62,23 @@
         </where>
     </select>
 
+    <!--获取企业唯一标识信息-->
+    <select id="getEntUniqueInfoList" parameterType="com.hanzhong.data.web.model.bo.EntUniqueInfoQryBO"
+            resultMap="entUniqueInfoMap">
+        SELECT
+        PRIPID, CREDITCODE,ORGCODE,ENTNAME,ENTSTATUS
+        FROM tblbusiness
+        <where>
+            <if test="entName != null and entName != ''">
+                AND ENTNAME = #{entName}
+            </if>
+            <if test="usCreditCode != null and usCreditCode != ''">
+                AND CREDITCODE = #{usCreditCode}
+            </if>
+            <if test="orgCode != null and orgCode != ''">
+                AND ORGCODE = #{orgCode}
+            </if>
+        </where>
+    </select>
 
 </mapper>

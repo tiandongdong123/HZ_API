@@ -4,12 +4,12 @@ import com.hanzhong.data.web.constant.DataPackageStatusEnum;
 import com.hanzhong.data.web.model.ChangeDataPackageInfo;
 import com.hanzhong.data.web.model.ChangeDataPackageInfoQryParam;
 import com.hanzhong.data.web.service.LdDataService;
-import com.hanzhong.data.web.util.longdun.LdApiUtils;
-import com.hanzhong.data.web.util.longdun.constant.DataPkgActionTypeEnum;
-import com.hanzhong.data.web.util.longdun.model.ApiResult;
-import com.hanzhong.data.web.util.longdun.model.ChangeDataPkgInfo;
-import com.hanzhong.data.web.util.longdun.model.ChangeDataPkgListQryParam;
-import com.hanzhong.data.web.util.longdun.model.DataPackageFinishParam;
+import com.hanzhong.data.web.util.BusinessHandlingUtils;
+import com.hanzhong.data.web.util.longdun.datapackageinfo.LdDataPackageInfoApiUtils;
+import com.hanzhong.data.web.util.longdun.datapackageinfo.constant.DataPkgActionTypeEnum;
+import com.hanzhong.data.web.util.longdun.datapackageinfo.model.ChangeDataPkgInfo;
+import com.hanzhong.data.web.util.longdun.datapackageinfo.model.ChangeDataPkgListQryParam;
+import com.hanzhong.data.web.util.longdun.datapackageinfo.model.DataPackageFinishParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -40,14 +40,15 @@ public class LdDataServiceImpl implements LdDataService {
     public List<ChangeDataPackageInfo> getChangeDataPackageList(ChangeDataPackageInfoQryParam qryParam) {
         // 创建变更数据包集查询参数
         ChangeDataPkgListQryParam listQryParam = createChangeDataPkgListQryParam(qryParam);
+
         // 获取变更数据包列表
-        logger.info("LdApiUtils.getChangeDataPackageListApiResult()的参数值：【{}】", listQryParam);
-        ApiResult apiResult = LdApiUtils.getChangeDataPackageListApiResult(listQryParam);
-        List<ChangeDataPkgInfo> pkgInfoList = LdApiUtils.getChangeDataPackageList(apiResult);
-        logger.info("LdApiUtils.getChangeDataPackageListApiResult()的返回值：【{}】", pkgInfoList);
+        logger.info("LdDataPackageInfoApiUtils.getChangeDataPkgInfoList()的参数值：【{}】", listQryParam);
+        List<ChangeDataPkgInfo> pkgInfoList = LdDataPackageInfoApiUtils.getChangeDataPkgInfoList(listQryParam);
+        logger.info("LdDataPackageInfoApiUtils.getChangeDataPkgInfoList()的返回值：【{}】", pkgInfoList);
+
         // 转换成List<ChangeDataPackageInfo>
         List<ChangeDataPackageInfo> packageInfoList = convertToChangeDataPackageInfoList(pkgInfoList);
-        logger.debug("转换成List<ChangeDataPackageInfo>的结果值：【{}】", packageInfoList);
+        logger.debug("List<ChangeDataPkgInfo>：【{}】，转换成List<ChangeDataPackageInfo>的结果值：【{}】", pkgInfoList, packageInfoList);
         return packageInfoList;
     }
 
@@ -62,9 +63,9 @@ public class LdDataServiceImpl implements LdDataService {
         DataPackageFinishParam finishParam = new DataPackageFinishParam();
         finishParam.setDataPackId(dataPkgId);
 
-        ApiResult apiResult = LdApiUtils.monitorDataPackageFinishApiResult(finishParam);
-        boolean monitorFlag = LdApiUtils.monitorDataPackageFinish(apiResult);
-
+        logger.info("LdDataPackageInfoApiUtils.monitorDataPackageFinishFlag()的参数值：【{}】", finishParam);
+        boolean monitorFlag = LdDataPackageInfoApiUtils.monitorDataPackageFinishFlag(finishParam);
+        logger.info("LdDataPackageInfoApiUtils.monitorDataPackageFinishFlag()的返回值：【{}】", monitorFlag);
         return monitorFlag;
     }
 
@@ -76,11 +77,16 @@ public class LdDataServiceImpl implements LdDataService {
      */
     private ChangeDataPkgListQryParam createChangeDataPkgListQryParam(ChangeDataPackageInfoQryParam qryParam) {
         ChangeDataPkgListQryParam listQryParam = new ChangeDataPkgListQryParam();
+        // 数据包回馈状态
         listQryParam.setActionTypeEnum(convertToDataPkgActionTypeEnum(qryParam.getStatusEnum()));
+        // 起始时间，格式：yyyy-MM-dd HH:mm:ss
         listQryParam.setStartTime(qryParam.getStartTime());
+        // 结束时间，格式：yyyy-MM-dd HH:mm:ss
         listQryParam.setEndTime(qryParam.getEndTime());
-        listQryParam.setPageNo(qryParam.getPageNum());
-        listQryParam.setPageSize(qryParam.getPageSize());
+        // 页码
+        listQryParam.setPageNo(BusinessHandlingUtils.getDefaultPageNum(qryParam.getPageNum()));
+        // 每页数量
+        listQryParam.setPageSize(BusinessHandlingUtils.getDefaultPageSize(qryParam.getPageSize()));
         return listQryParam;
     }
 
@@ -120,16 +126,22 @@ public class LdDataServiceImpl implements LdDataService {
         List<ChangeDataPackageInfo> packageInfoList = new ArrayList<>();
         for (ChangeDataPkgInfo pkgInfo : pkgInfoList) {
             ChangeDataPackageInfo packageInfo = new ChangeDataPackageInfo();
+            // 数据包id
             packageInfo.setDataPackId(pkgInfo.getDataPackId());
+            // 数据包名
             packageInfo.setDataPackName(pkgInfo.getDataPackName());
+            // 数据包时间戳
             packageInfo.setDataPackTime(pkgInfo.getDataPackTime());
+            // 文件大小
             packageInfo.setFileSize(pkgInfo.getFileSize());
+            // 记录数据
             packageInfo.setRecordCount(pkgInfo.getRecordCount());
+            // 业务编码
             packageInfo.setCode(pkgInfo.getCode());
+            // 密码
             packageInfo.setPassword(pkgInfo.getPassword());
             packageInfoList.add(packageInfo);
         }
-
         return packageInfoList;
     }
 

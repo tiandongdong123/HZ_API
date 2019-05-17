@@ -1,5 +1,7 @@
 package com.hanzhong.data.web.model.vo;
 
+import java.io.Serializable;
+
 /**
  *  
  *  @Description
@@ -7,7 +9,8 @@ package com.hanzhong.data.web.model.vo;
  *  @Date 2019/3/14 17:58 
  *  @Version  V1.0   
  */
-public class ChangeDataPkgInfoVO {
+public class ChangeDataPkgInfoVO implements Serializable {
+    private static final long serialVersionUID = -4963266899668807475L;
     /**
      * 数据包id
      */
