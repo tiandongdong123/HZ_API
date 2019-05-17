@@ -15,7 +15,7 @@ public interface BusinessDataService {
     /**
      * 获取企业基本信息
      *
-     * @param qryParam 参数
+     * @param qryParam 查询参数
      * @return EnterpriseBaseInfo
      */
     EnterpriseBaseInfo getEnterpriseBaseInfo(EnterpriseBaseInfoQryParam qryParam);

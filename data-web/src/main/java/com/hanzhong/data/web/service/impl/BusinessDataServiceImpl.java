@@ -9,19 +9,21 @@ import com.hanzhong.data.web.dao.slave.LdRegisterInfoDao;
 import com.hanzhong.data.web.model.EnterpriseBaseInfo;
 import com.hanzhong.data.web.model.EnterpriseBaseInfoQryParam;
 import com.hanzhong.data.web.model.bo.EnterpriseInfoBO;
-import com.hanzhong.data.web.model.bo.EnterpriseInfoQryParamBO;
-import com.hanzhong.data.web.model.bo.LdRegInfoQryParamBO;
+import com.hanzhong.data.web.model.bo.EnterpriseInfoQryBO;
+import com.hanzhong.data.web.model.bo.LdRegInfoQryBO;
 import com.hanzhong.data.web.model.entity.slave.LdRegisterInfoEntity;
 import com.hanzhong.data.web.service.BusinessDataService;
-import com.hanzhong.data.web.util.CheckUtils;
-import com.hanzhong.data.web.util.DateUtils;
-import com.hanzhong.data.web.util.DevZoneCodeUtils;
+import com.hanzhong.data.web.util.*;
+import com.hanzhong.data.web.util.gaodemap.base.GdMapUtils;
 import com.hanzhong.data.web.util.gaodemap.geocode.GeoCodeUtils;
-import com.hanzhong.data.web.util.gaodemap.geocode.model.GcGeoCode;
-import com.hanzhong.data.web.util.gaodemap.geocode.model.GcQryResult;
-import com.hanzhong.data.web.util.longdun.LdApiUtils;
-import com.hanzhong.data.web.util.longdun.constant.KeyWordTypeEnum;
-import com.hanzhong.data.web.util.longdun.model.*;
+import com.hanzhong.data.web.util.gaodemap.geocode.ReGeoCodeUtils;
+import com.hanzhong.data.web.util.gaodemap.geocode.model.*;
+import com.hanzhong.data.web.util.longdun.entbaseinfo.LdEntBaseInfoApiUtils;
+import com.hanzhong.data.web.util.longdun.entbaseinfo.constant.KeyWordTypeEnum;
+import com.hanzhong.data.web.util.longdun.entbaseinfo.model.EntInfo;
+import com.hanzhong.data.web.util.longdun.entbaseinfo.model.EntKeyWordQryParam;
+import com.hanzhong.data.web.util.longdun.entbaseinfo.model.RegisterInfo;
+import com.hanzhong.data.web.util.longdun.entbaseinfo.model.RegisterInfoQryParam;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,6 +58,10 @@ public class BusinessDataServiceImpl implements BusinessDataService {
      */
     private static final String MUNICIPAL_DISTRICT = "市辖区";
     /**
+     * 空数组字符串
+     */
+    private static final String EMPTY_ARRAY_STR = "[]";
+    /**
      * 线程池（注：设置线程池参数时，请详细了解ThreadPoolExecutor的相关知识，以免出现OOM）
      */
     private static ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(10, 20, 30, TimeUnit.SECONDS,
@@ -70,7 +76,7 @@ public class BusinessDataServiceImpl implements BusinessDataService {
     /**
      * 获取企业基本信息
      *
-     * @param qryParam 参数
+     * @param qryParam 查询参数
      * @return EnterpriseBaseInfo
      */
     @Override
@@ -119,12 +125,12 @@ public class BusinessDataServiceImpl implements BusinessDataService {
     /**
      * 获取本地库企业信息
      *
-     * @param qryParam 参数
+     * @param qryParam 查询参数
      * @return EnterpriseInfoBO 若未查询到数据，则返回null
      */
     private EnterpriseInfoBO getEnterpriseInfoOfLocal(EnterpriseBaseInfoQryParam qryParam) {
         // 创建企业信息查询参数
-        EnterpriseInfoQryParamBO qryParamBO = createEnterpriseInfoQryParam(qryParam);
+        EnterpriseInfoQryBO qryParamBO = createEnterpriseInfoQryParam(qryParam);
         logger.debug("获取本地库企业信息参数：转换前：【{}】，转换后：【{}】", qryParam, qryParamBO);
         // 获取企业信息
         logger.debug("TblBusinessDao.getEnterpriseInfoListByQryParam()的参数值：【{}】", qryParamBO);
@@ -146,12 +152,12 @@ public class BusinessDataServiceImpl implements BusinessDataService {
     /**
      * 获取龙盾库企业信息
      *
-     * @param qryParam 参数
+     * @param qryParam 查询参数
      * @return EnterpriseInfoBO 若未查询到数据，则返回null
      */
     private LdRegisterInfoEntity getEnterpriseInfoOfLd(EnterpriseBaseInfoQryParam qryParam) {
         // 创建企业信息查询参数
-        LdRegInfoQryParamBO qryParamBO = createLdRegInfoQryParam(qryParam);
+        LdRegInfoQryBO qryParamBO = createLdRegInfoQryParam(qryParam);
         logger.debug("获取龙盾库企业信息参数：转换前：【{}】，转换后：【{}】", qryParam, qryParamBO);
         // 查询企业信息
         logger.debug("LdRegisterInfoDao.getRegisterInfoListByQryParam()的参数值：【{}】", qryParamBO);
@@ -168,35 +174,35 @@ public class BusinessDataServiceImpl implements BusinessDataService {
     /**
      * 创建企业信息查询参数
      *
-     * @param qryParam 参数
+     * @param qryParam 查询参数
      * @return EnterpriseInfoQryParamBO
      */
-    private EnterpriseInfoQryParamBO createEnterpriseInfoQryParam(EnterpriseBaseInfoQryParam qryParam) {
-        EnterpriseInfoQryParamBO qryParamBO = new EnterpriseInfoQryParamBO();
+    private EnterpriseInfoQryBO createEnterpriseInfoQryParam(EnterpriseBaseInfoQryParam qryParam) {
+        EnterpriseInfoQryBO qryBO = new EnterpriseInfoQryBO();
         // 企业名称
-        qryParamBO.setEntName(qryParam.getEntName());
+        qryBO.setEntName(qryParam.getEntName());
         // 统一社会信用代码
-        qryParamBO.setUsCreditCode(qryParam.getUsCreditCode());
+        qryBO.setUsCreditCode(qryParam.getUsCreditCode());
         // 组织机构代码
-        qryParamBO.setOrgCode(qryParam.getOrgCode());
-        return qryParamBO;
+        qryBO.setOrgCode(qryParam.getOrgCode());
+        return qryBO;
     }
 
     /**
      * 创建龙盾企业信息查询参数
      *
-     * @param qryParam 参数
+     * @param qryParam 查询参数
      * @return EnterpriseInfoQryParamBO
      */
-    private LdRegInfoQryParamBO createLdRegInfoQryParam(EnterpriseBaseInfoQryParam qryParam) {
-        LdRegInfoQryParamBO qryParamBO = new LdRegInfoQryParamBO();
+    private LdRegInfoQryBO createLdRegInfoQryParam(EnterpriseBaseInfoQryParam qryParam) {
+        LdRegInfoQryBO qryBO = new LdRegInfoQryBO();
         // 企业名称
-        qryParamBO.setEntName(qryParam.getEntName());
+        qryBO.setEntName(qryParam.getEntName());
         // 统一社会信用代码
-        qryParamBO.setUsCreditCode(qryParam.getUsCreditCode());
+        qryBO.setUsCreditCode(qryParam.getUsCreditCode());
         // 组织机构代码
-        qryParamBO.setOrgCode(qryParam.getOrgCode());
-        return qryParamBO;
+        qryBO.setOrgCode(qryParam.getOrgCode());
+        return qryBO;
     }
 
     /**
@@ -293,30 +299,30 @@ public class BusinessDataServiceImpl implements BusinessDataService {
         //  经营(业务)范围
         baseInfo.setOpScope(ldRegisterInfoEntity.getOpScope());
         // 成立日期(格式：yyyy-MM-dd)
-        baseInfo.setEsDate(dateFormatIfBlank(ldRegisterInfoEntity.getEsDate()));
+        baseInfo.setEsDate(DateUtils.dateFormat(ldRegisterInfoEntity.getEsDate(), DateUtils.DEFAULT_DATE_FORMAT));
         // 核准日期(格式：yyyy-MM-dd)
-        baseInfo.setApprDate(dateFormatIfBlank(ldRegisterInfoEntity.getApprDate()));
+        baseInfo.setApprDate(DateUtils.dateFormat(ldRegisterInfoEntity.getApprDate(), DateUtils.DEFAULT_DATE_FORMAT));
         // 死亡日期(格式：yyyy-MM-dd)
-        baseInfo.setEndDate(dateFormatIfBlank(ldRegisterInfoEntity.getEndDate()));
+        baseInfo.setEndDate(DateUtils.dateFormat(ldRegisterInfoEntity.getEndDate(), DateUtils.DEFAULT_DATE_FORMAT));
         // 吊销日期(格式：yyyy-MM-dd)
-        baseInfo.setRevDate(dateFormatIfBlank(ldRegisterInfoEntity.getRevDate()));
+        baseInfo.setRevDate(DateUtils.dateFormat(ldRegisterInfoEntity.getRevDate(), DateUtils.DEFAULT_DATE_FORMAT));
         // 注销日期(格式：yyyy-MM-dd)
-        baseInfo.setCanDate(dateFormatIfBlank(ldRegisterInfoEntity.getCanDate()));
+        baseInfo.setCanDate(DateUtils.dateFormat(ldRegisterInfoEntity.getCanDate(), DateUtils.DEFAULT_DATE_FORMAT));
         // 经营(驻在)期限自(格式：yyyy-MM-dd)
-        baseInfo.setOpFrom(dateFormatIfBlank(ldRegisterInfoEntity.getOpFrom()));
+        baseInfo.setOpFrom(DateUtils.dateFormat(ldRegisterInfoEntity.getOpFrom(), DateUtils.DEFAULT_DATE_FORMAT));
         // 经营(驻在)期限至(格式：yyyy-MM-dd)
-        baseInfo.setOpTo((ldRegisterInfoEntity.getOpFrom() != null && ldRegisterInfoEntity.getOpTo() == null) ? CmnConstant.LONG_TERM_DATE : dateFormatIfBlank(ldRegisterInfoEntity.getOpTo()));
+        baseInfo.setOpTo((ldRegisterInfoEntity.getOpFrom() != null && ldRegisterInfoEntity.getOpTo() == null) ? CmnConstant.LONG_TERM_DATE : DateUtils.dateFormat(ldRegisterInfoEntity.getOpTo(), DateUtils.DEFAULT_DATE_FORMAT));
         // 法定代表人
         baseInfo.setName(ldRegisterInfoEntity.getFrdb());
         // 登记机关
         baseInfo.setRegOrg(ldRegisterInfoEntity.getRegOrg());
         // 邮政编码
-        baseInfo.setPostalCode(enterpriseInfoBO != null ? enterpriseInfoBO.getPostalCode() : "");
+        baseInfo.setPostalCode(enterpriseInfoBO == null ? "" : ObjectUtils.defaultString(enterpriseInfoBO.getPostalCode()));
         // 住所
         String dom = ldRegisterInfoEntity.getDom();
         baseInfo.setDom(dom);
         // 住所行政区划
-        String domDistrict = StringUtils.isNotBlank(dom) ? getAdministrativeDivision(ldRegisterInfoEntity.getDom()) : "";
+        String domDistrict = getAdministrativeDivision(ldRegisterInfoEntity.getDom(), ldRegisterInfoEntity.getJwd());
         baseInfo.setDomDistrict(domDistrict);
         // 住所所在经济开发区
         baseInfo.setEcoTecDevZone(enterpriseInfoBO != null ? DevZoneCodeUtils.getNameByCode(enterpriseInfoBO.getEcoTecDevZone()) : "");
@@ -373,12 +379,12 @@ public class BusinessDataServiceImpl implements BusinessDataService {
         // 登记机关
         baseInfo.setRegOrg(registerInfo.getRegOrg());
         // 邮政编码
-        baseInfo.setPostalCode(enterpriseInfoBO != null ? enterpriseInfoBO.getPostalCode() : "");
+        baseInfo.setPostalCode(enterpriseInfoBO == null ? "" : ObjectUtils.defaultString(enterpriseInfoBO.getPostalCode()));
         // 住所
         String dom = registerInfo.getDom();
         baseInfo.setDom(dom);
         // 住所行政区划
-        String domDistrict = StringUtils.isNotBlank(dom) ? getAdministrativeDivision(registerInfo.getDom()) : "";
+        String domDistrict = getAdministrativeDivision(registerInfo.getDom(), registerInfo.getJwd());
         baseInfo.setDomDistrict(domDistrict);
         // 住所所在经济开发区
         baseInfo.setEcoTecDevZone(enterpriseInfoBO != null ? DevZoneCodeUtils.getNameByCode(enterpriseInfoBO.getEcoTecDevZone()) : "");
@@ -386,13 +392,22 @@ public class BusinessDataServiceImpl implements BusinessDataService {
     }
 
     /**
-     * 格式化时间
+     * 获取行政区划信息
      *
-     * @param date 时间
+     * @param address 地址
+     * @param lonLat  经纬度
      * @return String
      */
-    private String dateFormatIfBlank(Date date) {
-        return date == null ? null : DateUtils.dateFormat(date, DateUtils.DEFAULT_DATE_FORMAT);
+    private String getAdministrativeDivision(String address, String lonLat) {
+        String formatLonLat = BusinessHandlingUtils.formatLonLat(lonLat);
+        if (StringUtils.isNotBlank(formatLonLat)) {
+            String[] array = formatLonLat.split(BusinessHandlingUtils.SEPARATOR_COMMA);
+            return getAdministrativeDivisionByLonLat(array[0], array[1]);
+        }
+        if (StringUtils.isNotBlank(address)) {
+            return getAdministrativeDivisionByAddress(address);
+        }
+        return StringUtils.EMPTY;
     }
 
     /**
@@ -401,25 +416,49 @@ public class BusinessDataServiceImpl implements BusinessDataService {
      * @param address 地址
      * @return String
      */
-    private String getAdministrativeDivision(String address) {
+    private String getAdministrativeDivisionByAddress(String address) {
         logger.debug("GeoCodeUtils.getGeoCodeInfo()的参数值：address：【{}】", address);
-        GcQryResult gcQryResult = GeoCodeUtils.getGeoCodeInfo(address, "");
-        logger.debug("GeoCodeUtils.getGeoCodeInfo()的返回值：【{}】", gcQryResult);
+        GeoCodeQryResult geoCodeQryResult = GeoCodeUtils.getGeoCodeInfo(address, "");
+        logger.debug("GeoCodeUtils.getGeoCodeInfo()的返回值：【{}】", geoCodeQryResult);
 
         // 判断是否有查询结果
-        boolean haveResultFlag = GeoCodeUtils.isSuccess(gcQryResult) && Integer.parseInt(StringUtils.defaultIfEmpty(gcQryResult.getCount(), "0")) > 0;
+        boolean haveResultFlag = GeoCodeUtils.isSuccess(geoCodeQryResult) && Integer.parseInt(StringUtils.defaultIfEmpty(geoCodeQryResult.getCount(), "0")) > 0;
         if (!haveResultFlag) {
             logger.warn("address：【{}】，通过地址获取的地理编码信息为空！", address);
             return StringUtils.EMPTY;
         }
 
-        List<GcGeoCode> gcGeoCodeList = gcQryResult.getGcGeoCodes();
+        List<GeoCodeInfo> geoCodeInfoList = geoCodeQryResult.getGeoCodeInfoList();
         // 若只有一条查询结果，则取之
-        if (gcGeoCodeList != null && !gcGeoCodeList.isEmpty()) {
-            GcGeoCode gcGeoCode = gcGeoCodeList.get(0);
-            return connectAdministrativeDivision(gcGeoCode.getProvince(), gcGeoCode.getCity(), gcGeoCode.getDistrict());
+        if (geoCodeInfoList != null && !geoCodeInfoList.isEmpty()) {
+            GeoCodeInfo geoCodeInfo = geoCodeInfoList.get(0);
+            return connectAdministrativeDivision(geoCodeInfo.getProvince(), geoCodeInfo.getCity(), geoCodeInfo.getDistrict());
         }
         return StringUtils.EMPTY;
+    }
+
+    /**
+     * 获取行政区划信息
+     *
+     * @param longitude 经度
+     * @param latitude  纬度
+     * @return String
+     */
+    private String getAdministrativeDivisionByLonLat(String longitude, String latitude) {
+        logger.debug("ReGeoCodeUtils.getReGeoCodeInfo()的参数值：经纬度：【{},{}】", longitude, latitude);
+        ReGeoCodeQryResult qryResult = ReGeoCodeUtils.getReGeoCodeInfo(longitude, latitude);
+        logger.debug("ReGeoCodeUtils.getReGeoCodeInfo()的返回值：【{}】", qryResult);
+
+        // 判断是否有查询结果
+        boolean haveResultFlag = GdMapUtils.isSuccess(qryResult);
+        if (!haveResultFlag) {
+            logger.warn("经纬度：【{},{}】，通过经纬度获取的逆地理编码信息为空！", longitude, latitude);
+            return StringUtils.EMPTY;
+        }
+
+        ReGeoCodeInfo reGeoCodeInfo = qryResult.getReGeoCodeInfo();
+        AddressComponent addressComponent = reGeoCodeInfo == null ? new AddressComponent() : reGeoCodeInfo.getAddressComponent();
+        return connectAdministrativeDivision(addressComponent.getProvince(), addressComponent.getCity(), addressComponent.getDistrict());
     }
 
     /**
@@ -433,15 +472,15 @@ public class BusinessDataServiceImpl implements BusinessDataService {
     private String connectAdministrativeDivision(String province, String city, String district) {
         StringBuilder strBuilder = new StringBuilder();
         // 省
-        if (StringUtils.isNotBlank(province)) {
+        if (StringUtils.isNotBlank(province) && !EMPTY_ARRAY_STR.equals(province)) {
             strBuilder.append(province);
         }
         // 市，若为“市辖区”则不拼
-        if (StringUtils.isNotBlank(city) && !MUNICIPAL_DISTRICT.equals(city) && !city.equals(province)) {
+        if (StringUtils.isNotBlank(city) && !MUNICIPAL_DISTRICT.equals(city) && !EMPTY_ARRAY_STR.equals(city) && !city.equals(province)) {
             strBuilder.append(SLASH_SEPARATOR + city);
         }
         // 区
-        if (StringUtils.isNotBlank(district)) {
+        if (StringUtils.isNotBlank(district) && !EMPTY_ARRAY_STR.equals(district)) {
             strBuilder.append(SLASH_SEPARATOR + district);
         }
         return strBuilder.toString();
@@ -456,20 +495,11 @@ public class BusinessDataServiceImpl implements BusinessDataService {
     private RegisterInfo getRegInfoFromLdByEntName(String entName) {
         RegisterInfoQryParam infoQryParam = new RegisterInfoQryParam();
         infoQryParam.setEntName(entName);
-        logger.debug("LdApiUtils.getRegisterInfoApiResult()的参数值：【{}】", entName);
+        logger.debug("LdEntBaseInfoApiUtils.getRegInfo()的参数值：【{}】", entName);
         // 获取企业登记信息
-        ApiResult apiResult = LdApiUtils.getRegisterInfoApiResult(infoQryParam);
-        logger.debug("LdApiUtils.getRegisterInfoApiResult()的返回值：【{}】", apiResult);
-        if (apiResult == null) {
-            return null;
-        }
-
-        // 判断结果数据是否为空
-        List<RegisterInfo> registerInfoList = (List<RegisterInfo>) apiResult.getResultData();
-        if (registerInfoList == null || registerInfoList.isEmpty()) {
-            return null;
-        }
-        return registerInfoList.get(0);
+        RegisterInfo registerInfo = LdEntBaseInfoApiUtils.getRegInfo(infoQryParam);
+        logger.debug("LdEntBaseInfoApiUtils.getRegInfo()的返回值：【{}】", registerInfo);
+        return registerInfo;
     }
 
     /**
@@ -482,30 +512,11 @@ public class BusinessDataServiceImpl implements BusinessDataService {
         EntKeyWordQryParam keyWordQryParam = new EntKeyWordQryParam();
         keyWordQryParam.setKeyword(usCreditCode);
         keyWordQryParam.setKeyWordTypeEnum(KeyWordTypeEnum.REG_NUM_OR_USCC_NUM);
-        logger.debug("LdApiUtils.getEntApiResultByKeyword()的参数值：【{}】", usCreditCode);
+        logger.debug("LdEntBaseInfoApiUtils.getEntInfoByKeyword()的参数值：【{}】", usCreditCode);
         // 根据关键字获取企业列表信息
-        ApiResult apiResult = LdApiUtils.getEntApiResultByKeyword(keyWordQryParam);
-        logger.debug("LdApiUtils.getEntApiResultByKeyword()的返回值：【{}】", apiResult);
-        if (apiResult == null) {
-            return null;
-        }
-
-        // 判断结果数据是否为空
-        List<EntInfo> entInfoList = (List<EntInfo>) apiResult.getResultData();
-        if (entInfoList == null || entInfoList.isEmpty()) {
-            return null;
-        }
-
-        if (KeyWordTypeEnum.ENT_NAME.equals(keyWordQryParam.getKeyWordTypeEnum())) {
-            for (EntInfo entInfo : entInfoList) {
-                if (entInfo.getEntName().equals(keyWordQryParam.getKeyword())) {
-                    return entInfo;
-                }
-            }
-        } else if (KeyWordTypeEnum.REG_NUM_OR_USCC_NUM.equals(keyWordQryParam.getKeyWordTypeEnum())) {
-            return entInfoList.get(0);
-        }
-        return null;
+        EntInfo entInfo = LdEntBaseInfoApiUtils.getEntInfoByKeyword(keyWordQryParam);
+        logger.debug("LdEntBaseInfoApiUtils.getEntInfoByKeyword()的返回值：【{}】", entInfo);
+        return entInfo;
     }
 
     /**
@@ -527,7 +538,7 @@ public class BusinessDataServiceImpl implements BusinessDataService {
      * @return int
      */
     private int recordRegisterInfoOfLd(RegisterInfo registerInfo) {
-        LdRegInfoQryParamBO qryParamBO = new LdRegInfoQryParamBO();
+        LdRegInfoQryBO qryParamBO = new LdRegInfoQryBO();
         qryParamBO.setEntName(registerInfo.getEntName());
         // 查询企业信息
         List<LdRegisterInfoEntity> registerInfoEntityList = ldRegisterInfoDao.getRegisterInfoListByQryParam(qryParamBO);
@@ -621,7 +632,6 @@ public class BusinessDataServiceImpl implements BusinessDataService {
         if (StringUtils.isBlank(dateStr)) {
             return null;
         }
-
         return DateUtils.parse(dateStr, DateUtils.DEFAULT_DATE_FORMAT);
     }
 
@@ -633,4 +643,5 @@ public class BusinessDataServiceImpl implements BusinessDataService {
     private String createRandomPripId() {
         return "LD_" + UUID.randomUUID();
     }
+
 }

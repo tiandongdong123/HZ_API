@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hanzhong.data.web.dao.master.TblMedicalDevicesDao">
+    <resultMap id="baseResultMap" type="com.hanzhong.data.web.model.entity.master.TblMedicalDevicesEntity">
+        <id column="ID" property="id" jdbcType="BIGINT"/>
+        <result column="PRIPID" property="pripId" jdbcType="VARCHAR"/>
+        <result column="REGCERTNUM" property="regCertNum" jdbcType="VARCHAR"/>
+        <result column="ENTNAME" property="entName" jdbcType="VARCHAR"/>
+        <result column="DOM" property="dom" jdbcType="VARCHAR"/>
+        <result column="OPLOC" property="opLoc" jdbcType="VARCHAR"/>
+        <result column="AGYNAME" property="agyName" jdbcType="VARCHAR"/>
+        <result column="AGYDOM" property="agyDom" jdbcType="VARCHAR"/>
+        <result column="PRODNAME" property="prodName" jdbcType="VARCHAR"/>
+        <result column="SPEC" property="spec" jdbcType="VARCHAR"/>
+        <result column="STRUC" property="struc" jdbcType="VARCHAR"/>
+        <result column="APPSCOPE" property="appScope" jdbcType="VARCHAR"/>
+        <result column="OTHDESC" property="othDesc" jdbcType="VARCHAR"/>
+        <result column="REMARK" property="remark" jdbcType="VARCHAR"/>
+        <result column="APRVDATE" property="aprvDate" jdbcType="VARCHAR"/>
+        <result column="EXPDATE" property="expDate" jdbcType="VARCHAR"/>
+        <result column="PRODSTD" property="prodStd" jdbcType="VARCHAR"/>
+        <result column="REVDATE" property="revDate" jdbcType="VARCHAR"/>
+        <result column="POSTALCODE" property="postalCode" jdbcType="VARCHAR"/>
+        <result column="MAJORCONST" property="majorConst" jdbcType="VARCHAR"/>
+        <result column="INTENDUSE" property="intendUse" jdbcType="VARCHAR"/>
+        <result column="STGCOND" property="stgCond" jdbcType="VARCHAR"/>
+        <result column="APRVDEPT" property="aprvDept" jdbcType="VARCHAR"/>
+        <result column="ALTERATION" property="alteration" jdbcType="VARCHAR"/>
+        <result column="DETLLINK" property="detlLink" jdbcType="VARCHAR"/>
+        <result column="updated_at" property="updatedAt" jdbcType="DATE"/>
+    </resultMap>
+
+    <sql id="baseColumn">
+      ID,PRIPID,REGCERTNUM,ENTNAME,DOM,OPLOC,AGYNAME,AGYDOM,PRODNAME,SPEC,STRUC,APPSCOPE,OTHDESC,REMARK,APRVDATE,EXPDATE,
+      PRODSTD,REVDATE,POSTALCODE,MAJORCONST,INTENDUSE,STGCOND,APRVDEPT,ALTERATION,DETLLINK,updated_at
+    </sql>
+
+    <!--获取医疗器械信息总数-->
+    <select id="getMedicalDeviceInfoCount" parameterType="com.hanzhong.data.web.model.bo.MedicalDeviceInfoQryBO"
+            resultType="java.lang.Integer">
+        SELECT
+        COUNT(ID)
+        FROM tblmedical_devices
+        <where>
+            <if test="regCertNum != null and regCertNum != ''">
+                AND REGCERTNUM = #{regCertNum}
+            </if>
+        </where>
+    </select>
+
+    <!--获取医疗器械信息-->
+    <select id="getMedicalDeviceInfoList" parameterType="com.hanzhong.data.web.model.bo.MedicalDeviceInfoQryBO"
+            resultMap="baseResultMap">
+        SELECT
+        <include refid="baseColumn"></include>
+        FROM tblmedical_devices
+        <where>
+            <if test="regCertNum != null and regCertNum != ''">
+                AND REGCERTNUM = #{regCertNum}
+            </if>
+        </where>
+        LIMIT #{startIndex},#{pageSize}
+    </select>
+
+    <!--获取企业医疗器械信息总数-->
+    <select id="getEntMedicalDeviceInfoCount" parameterType="com.hanzhong.data.web.model.bo.EntMedicalDeviceInfoQryBO"
+            resultType="java.lang.Integer">
+        SELECT
+        COUNT(ID)
+        FROM tblmedical_devices
+        <where>
+            <if test="pripId != null and pripId != ''">
+                AND PRIPID = #{pripId}
+            </if>
+            <if test="entName != null and entName != ''">
+                AND ENTNAME = #{entName}
+            </if>
+        </where>
+    </select>
+
+    <!--获取企业医疗器械信息-->
+    <select id="getEntMedicalDeviceInfoList" parameterType="com.hanzhong.data.web.model.bo.EntMedicalDeviceInfoQryBO"
+            resultMap="baseResultMap">
+        SELECT
+        <include refid="baseColumn"></include>
+        FROM tblmedical_devices
+        <where>
+            <if test="pripId != null and pripId != ''">
+                AND PRIPID = #{pripId}
+            </if>
+            <if test="entName != null and entName != ''">
+                AND ENTNAME = #{entName}
+            </if>
+        </where>
+        LIMIT #{startIndex},#{pageSize}
+    </select>
+
+</mapper>

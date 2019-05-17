@@ -1,7 +1,10 @@
 package com.hanzhong.data.web.dao.slave;
 
-import com.hanzhong.data.web.model.bo.LdRegInfoQryParamBO;
+import com.hanzhong.data.web.model.bo.EntUniqueInfoBO;
+import com.hanzhong.data.web.model.bo.EntUniqueInfoQryBO;
+import com.hanzhong.data.web.model.bo.LdRegInfoQryBO;
 import com.hanzhong.data.web.model.entity.slave.LdRegisterInfoEntity;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
@@ -12,6 +15,7 @@ import java.util.List;
  *  @Date 2019/1/13 15:19 
  *  @Version  V1.0   
  */
+@Repository("ldRegisterInfoDao")
 public interface LdRegisterInfoDao {
 
     /**
@@ -20,7 +24,7 @@ public interface LdRegisterInfoDao {
      * @param qryParamBO 查询参数
      * @return List<LdRegisterInfoEntity>
      */
-    List<LdRegisterInfoEntity> getRegisterInfoListByQryParam(LdRegInfoQryParamBO qryParamBO);
+    List<LdRegisterInfoEntity> getRegisterInfoListByQryParam(LdRegInfoQryBO qryParamBO);
 
     /**
      * 添加企业登记信息
@@ -37,4 +41,12 @@ public interface LdRegisterInfoDao {
      * @return int
      */
     int updateRegisterInfo(LdRegisterInfoEntity registerInfoEntity);
+
+    /**
+     * 获取企业唯一标识信息
+     *
+     * @param qryBO 查询参数
+     * @return List<EntUniqueInfoBO>
+     */
+    List<EntUniqueInfoBO> getEntUniqueInfoList(EntUniqueInfoQryBO qryBO);
 }

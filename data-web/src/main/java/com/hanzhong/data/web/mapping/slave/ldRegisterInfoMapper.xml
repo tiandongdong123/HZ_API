@@ -32,12 +32,40 @@
         <result column="UPDATE_TIME" property="updateTime" jdbcType="BIGINT"/>
     </resultMap>
 
+    <resultMap id="entUniqueInfoMap" type="com.hanzhong.data.web.model.bo.EntUniqueInfoBO">
+        <result column="PRIPID" property="pripId" jdbcType="VARCHAR"/>
+        <result column="SHXYDM" property="usCreditCode" jdbcType="VARCHAR"/>
+        <result column="ORGID" property="orgCode" jdbcType="VARCHAR"/>
+        <result column="ENTNAME" property="entName" jdbcType="VARCHAR"/>
+        <result column="ENTSTATUS" property="entStatus" jdbcType="VARCHAR"/>
+    </resultMap>
+
     <!--获取企业登记信息-->
-    <select id="getRegisterInfoListByQryParam" parameterType="com.hanzhong.data.web.model.bo.LdRegInfoQryParamBO" resultMap="baseInfoMap">
+    <select id="getRegisterInfoListByQryParam" parameterType="com.hanzhong.data.web.model.bo.LdRegInfoQryBO"
+            resultMap="baseInfoMap">
         SELECT
         ID, PRIPID,ENTNAME, OLDNAME, SHXYDM, FRDB, ESDATE, ENTSTATUS, REGCAP, REGCAPCUR, DOM, ENTTYPE, OPSCOPE,
         REGORG, OPFROM, OPTO, APPRDATE, ENDDATE, REVDATE, CANDATE, JWD, INDUSTRY, INDUSTRY_CODE, PROVINCE, ORGID,
         ENGNAME, WEBSITE, UPDATE_TIME
+        FROM ld_register_info
+        <where>
+            <if test="entName != null and entName != ''">
+                AND ENTNAME = #{entName}
+            </if>
+            <if test="usCreditCode != null and usCreditCode != ''">
+                AND SHXYDM = #{usCreditCode}
+            </if>
+            <if test="orgCode != null and orgCode != ''">
+                AND ORGID = #{orgCode}
+            </if>
+        </where>
+    </select>
+
+    <!--获取企业唯一标识信息-->
+    <select id="getEntUniqueInfoList" parameterType="com.hanzhong.data.web.model.bo.EntUniqueInfoQryBO"
+            resultMap="entUniqueInfoMap">
+        SELECT
+        PRIPID, SHXYDM,ORGID,ENTNAME,ENTSTATUS
         FROM ld_register_info
         <where>
             <if test="entName != null and entName != ''">

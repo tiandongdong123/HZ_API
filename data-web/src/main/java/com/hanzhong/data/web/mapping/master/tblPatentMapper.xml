@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hanzhong.data.web.dao.master.TblPatentDao">
+    <resultMap id="baseResultMap" type="com.hanzhong.data.web.model.entity.master.TblPatentEntity">
+        <id column="ID" property="id" jdbcType="BIGINT"/>
+        <result column="pub_num" property="pubNum" jdbcType="VARCHAR"/>
+        <result column="pub_date" property="pubDate" jdbcType="VARCHAR"/>
+        <result column="patent_id" property="patentId" jdbcType="VARCHAR"/>
+        <result column="app_date" property="appDate" jdbcType="VARCHAR"/>
+        <result column="patent_num" property="patentNum" jdbcType="VARCHAR"/>
+        <result column="patent_title" property="patentTitle" jdbcType="VARCHAR"/>
+        <result column="main_classcode_ys" property="ysMainClassCode" jdbcType="VARCHAR"/>
+        <result column="class_code_ys" property="ysClassCode" jdbcType="VARCHAR"/>
+        <result column="app_num_old" property="oldAppNum" jdbcType="VARCHAR"/>
+        <result column="priority" property="priority" jdbcType="VARCHAR"/>
+        <result column="proposer_name" property="proposerName" jdbcType="VARCHAR"/>
+        <result column="inv_name" property="invName" jdbcType="VARCHAR"/>
+        <result column="app_address" property="appAddress" jdbcType="VARCHAR"/>
+        <result column="award_date" property="awardDate" jdbcType="VARCHAR"/>
+        <result column="int_app" property="intApp" jdbcType="VARCHAR"/>
+        <result column="int_pub" property="intPub" jdbcType="VARCHAR"/>
+        <result column="nation_date" property="nationDate" jdbcType="VARCHAR"/>
+        <result column="agy_org_name" property="agyOrgName" jdbcType="VARCHAR"/>
+        <result column="agy_per_name" property="agyPerName" jdbcType="VARCHAR"/>
+        <result column="abstract" property="summary" jdbcType="VARCHAR"/>
+        <result column="signory" property="signory" jdbcType="VARCHAR"/>
+        <result column="refdoc_cnt" property="refDoc" jdbcType="VARCHAR"/>
+        <result column="examiner" property="examiner" jdbcType="VARCHAR"/>
+        <result column="disk_num" property="diskNum" jdbcType="VARCHAR"/>
+        <result column="PCT_pub" property="pctPub" jdbcType="VARCHAR"/>
+        <result column="PCT_app" property="pctApp" jdbcType="VARCHAR"/>
+        <result column="PCT_info" property="pctInfo" jdbcType="VARCHAR"/>
+        <result column="category" property="category" jdbcType="VARCHAR"/>
+        <result column="server_url" property="serverUrl" jdbcType="VARCHAR"/>
+        <result column="issue_dir" property="issueDir" jdbcType="VARCHAR"/>
+        <result column="page_cnt" property="pageCount" jdbcType="VARCHAR"/>
+        <result column="app_area_code" property="appAreaCode" jdbcType="VARCHAR"/>
+        <result column="source_db" property="sourceDb" jdbcType="VARCHAR"/>
+        <result column="batch_id" property="batchId" jdbcType="VARCHAR"/>
+        <result column="patent_wjy" property="patentWjy" jdbcType="VARCHAR"/>
+        <result column="patent_type" property="patentType" jdbcType="VARCHAR"/>
+        <result column="F_ClassSort" property="fClassSort" jdbcType="VARCHAR"/>
+        <result column="main_classcode" property="mainClassCode" jdbcType="VARCHAR"/>
+        <result column="main_classcode_num" property="mainClassCodeNum" jdbcType="INTEGER"/>
+        <result column="class_code" property="classCode" jdbcType="VARCHAR"/>
+        <result column="class_code_num" property="classCodeNum" jdbcType="INTEGER"/>
+        <result column="F_LawStatus" property="fLawStatus" jdbcType="VARCHAR"/>
+        <result column="WFInstitutionName" property="wfInstitutionName" jdbcType="VARCHAR"/>
+        <result column="pdf" property="pdf" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="baseColumn">
+      ID,pub_num,pub_date,patent_id,app_date,patent_num,patent_title,main_classcode_ys,class_code_ys,app_num_old,priority,
+      proposer_name,inv_name,app_address,award_date,int_app,int_pub,nation_date,agy_org_name,agy_per_name,abstract,
+      signory,refdoc_cnt,examiner,disk_num,PCT_pub,PCT_app,PCT_info,category,server_url,issue_dir,page_cnt,app_area_code,
+      source_db,batch_id,patent_wjy,patent_type,F_ClassSort,main_classcode,main_classcode_num,class_code,class_code_num,
+      F_LawStatus,WFInstitutionName,pdf
+    </sql>
+
+    <sql id="baseRepeatColumn">
+      p.ID,pub_num,pub_date,patent_id,app_date,patent_num,patent_title,main_classcode_ys,class_code_ys,app_num_old,priority,
+      proposer_name,inv_name,app_address,award_date,int_app,int_pub,nation_date,agy_org_name,agy_per_name,abstract,
+      signory,refdoc_cnt,examiner,disk_num,PCT_pub,PCT_app,PCT_info,category,server_url,issue_dir,page_cnt,app_area_code,
+      source_db,batch_id,patent_wjy,patent_type,F_ClassSort,main_classcode,main_classcode_num,class_code,class_code_num,
+      F_LawStatus,WFInstitutionName,pdf
+    </sql>
+
+    <!--获取专利信息总数-->
+    <select id="getPatentInfoCount" parameterType="com.hanzhong.data.web.model.bo.PatentInfoQryBO"
+            resultType="java.lang.Integer">
+        SELECT
+        COUNT(ID)
+        FROM tblpatent
+        <where>
+            <if test="patentId != null and patentId != ''">
+                AND patent_id = #{patentId}
+            </if>
+        </where>
+    </select>
+
+    <!--获取专利信息-->
+    <select id="getPatentInfoList" parameterType="com.hanzhong.data.web.model.bo.PatentInfoQryBO"
+            resultMap="baseResultMap">
+        SELECT
+        <include refid="baseColumn"></include>
+        FROM tblpatent
+        <where>
+            <if test="patentId != null and patentId != ''">
+                AND patent_id = #{patentId}
+            </if>
+        </where>
+        LIMIT #{startIndex},#{pageSize}
+    </select>
+
+    <!--获取企业专利信息总数-->
+    <select id="getEntPatentInfoCount" parameterType="com.hanzhong.data.web.model.bo.EntPatentInfoQryBO"
+            resultType="java.lang.Integer">
+        SELECT
+        COUNT(p.ID)
+        FROM tblpatent p,tblpatentresult_new r
+        <where>
+            <if test="pripId != null and pripId != ''">
+                AND PRIPID = #{pripId}
+            </if>
+            <if test="entName != null and entName != ''">
+                AND r.ENTNAME = #{entName}
+            </if>
+            AND p.patent_id = r.RESULT_NUM
+        </where>
+    </select>
+
+    <!--获取企业专利信息-->
+    <select id="getEntPatentInfoList" parameterType="com.hanzhong.data.web.model.bo.EntPatentInfoQryBO"
+            resultMap="baseResultMap">
+        SELECT
+        <include refid="baseRepeatColumn"></include>
+        FROM tblpatent p,tblpatentresult_new r
+        <where>
+            <if test="pripId != null and pripId != ''">
+                AND PRIPID = #{pripId}
+            </if>
+            <if test="entName != null and entName != ''">
+                AND r.ENTNAME = #{entName}
+            </if>
+            AND p.patent_id = r.RESULT_NUM
+        </where>
+        LIMIT #{startIndex},#{pageSize}
+    </select>
+
+</mapper>
