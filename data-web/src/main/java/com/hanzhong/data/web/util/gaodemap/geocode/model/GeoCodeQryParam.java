@@ -2,17 +2,16 @@ package com.hanzhong.data.web.util.gaodemap.geocode.model;
 
 /**
  *    
- *  @Description
+ *  @Description 地理编码查询参数
  *  @Author   luqs   
  *  @Date 2018/8/20 12:23 
  *  @Version  V1.0   
  */
-public class GcQryParam {
+public class GeoCodeQryParam {
     /**
      * 高德Key
      */
     private String key;
-
     /**
      * 结构化地址信息，
      * 规则遵循：国家、省份、城市、区县、城镇、乡村、街道、门牌号码、屋邨、大厦，如：北京市朝阳区阜通东大街6号。

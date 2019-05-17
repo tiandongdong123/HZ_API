@@ -4,12 +4,12 @@ import com.alibaba.fastjson.annotation.JSONField;
 
 /**
  *    
- *  @Description
+ *  @Description 地理编码信息
  *  @Author   luqs   
  *  @Date 2018/8/20 12:35 
  *  @Version  V1.0   
  */
-public class GcGeoCode {
+public class GeoCodeInfo {
 
     /**
      * 结构化地址信息

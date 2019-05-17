@@ -40,9 +40,17 @@ public class BusinessHandlingUtils {
      */
     private static final Pattern DOT_DATE_PATTERN = Pattern.compile("^\\d{4}\\.\\d{2}\\.\\d{2}$");
     /**
+     * 正则表达式：东经：* 北纬：*，如：东经：116.317964 北纬：39.973508
+     */
+    private static final Pattern LON_LAT_PATTERN = Pattern.compile("^东经：\\d+.\\d+ 北纬：\\d+.\\d+$");
+    /**
      * 分隔符：.
      */
     private static final String SEPARATOR_DOT = ".";
+    /**
+     * 分隔符：,
+     */
+    public static final String SEPARATOR_COMMA = ",";
     /**
      * 分隔符：-
      */
@@ -159,7 +167,20 @@ public class BusinessHandlingUtils {
     }
 
     /**
-     * 格式点分隔的日期
+     * 格式化经纬度
+     *
+     * @param lonLat 经纬度，如：东经：116.317964 北纬：39.973508
+     * @return String 若lonLat不符合正则，则返回null
+     */
+    public static String formatLonLat(String lonLat) {
+        if (StringUtils.isNotBlank(lonLat) && LON_LAT_PATTERN.matcher(lonLat).matches()) {
+            return lonLat.replace("东经：", "").replace(" 北纬：", SEPARATOR_COMMA);
+        }
+        return null;
+    }
+
+    /**
+     * 格式化点分隔的日期
      *
      * @param dateStr      点分隔的日期，如：2019.03.30
      * @param defaultValue 默认值

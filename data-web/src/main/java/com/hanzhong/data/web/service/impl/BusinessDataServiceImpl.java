@@ -13,12 +13,11 @@ import com.hanzhong.data.web.model.bo.EnterpriseInfoQryBO;
 import com.hanzhong.data.web.model.bo.LdRegInfoQryBO;
 import com.hanzhong.data.web.model.entity.slave.LdRegisterInfoEntity;
 import com.hanzhong.data.web.service.BusinessDataService;
-import com.hanzhong.data.web.util.CheckUtils;
-import com.hanzhong.data.web.util.DateUtils;
-import com.hanzhong.data.web.util.DevZoneCodeUtils;
+import com.hanzhong.data.web.util.*;
+import com.hanzhong.data.web.util.gaodemap.base.GdMapUtils;
 import com.hanzhong.data.web.util.gaodemap.geocode.GeoCodeUtils;
-import com.hanzhong.data.web.util.gaodemap.geocode.model.GcGeoCode;
-import com.hanzhong.data.web.util.gaodemap.geocode.model.GcQryResult;
+import com.hanzhong.data.web.util.gaodemap.geocode.ReGeoCodeUtils;
+import com.hanzhong.data.web.util.gaodemap.geocode.model.*;
 import com.hanzhong.data.web.util.longdun.entbaseinfo.LdEntBaseInfoApiUtils;
 import com.hanzhong.data.web.util.longdun.entbaseinfo.constant.KeyWordTypeEnum;
 import com.hanzhong.data.web.util.longdun.entbaseinfo.model.EntInfo;
@@ -58,6 +57,10 @@ public class BusinessDataServiceImpl implements BusinessDataService {
      * 市辖区
      */
     private static final String MUNICIPAL_DISTRICT = "市辖区";
+    /**
+     * 空数组字符串
+     */
+    private static final String EMPTY_ARRAY_STR = "[]";
     /**
      * 线程池（注：设置线程池参数时，请详细了解ThreadPoolExecutor的相关知识，以免出现OOM）
      */
@@ -314,12 +317,12 @@ public class BusinessDataServiceImpl implements BusinessDataService {
         // 登记机关
         baseInfo.setRegOrg(ldRegisterInfoEntity.getRegOrg());
         // 邮政编码
-        baseInfo.setPostalCode(enterpriseInfoBO != null ? enterpriseInfoBO.getPostalCode() : "");
+        baseInfo.setPostalCode(enterpriseInfoBO == null ? "" : ObjectUtils.defaultString(enterpriseInfoBO.getPostalCode()));
         // 住所
         String dom = ldRegisterInfoEntity.getDom();
         baseInfo.setDom(dom);
         // 住所行政区划
-        String domDistrict = StringUtils.isNotBlank(dom) ? getAdministrativeDivision(ldRegisterInfoEntity.getDom()) : "";
+        String domDistrict = getAdministrativeDivision(ldRegisterInfoEntity.getDom(), ldRegisterInfoEntity.getJwd());
         baseInfo.setDomDistrict(domDistrict);
         // 住所所在经济开发区
         baseInfo.setEcoTecDevZone(enterpriseInfoBO != null ? DevZoneCodeUtils.getNameByCode(enterpriseInfoBO.getEcoTecDevZone()) : "");
@@ -376,12 +379,12 @@ public class BusinessDataServiceImpl implements BusinessDataService {
         // 登记机关
         baseInfo.setRegOrg(registerInfo.getRegOrg());
         // 邮政编码
-        baseInfo.setPostalCode(enterpriseInfoBO != null ? enterpriseInfoBO.getPostalCode() : "");
+        baseInfo.setPostalCode(enterpriseInfoBO == null ? "" : ObjectUtils.defaultString(enterpriseInfoBO.getPostalCode()));
         // 住所
         String dom = registerInfo.getDom();
         baseInfo.setDom(dom);
         // 住所行政区划
-        String domDistrict = StringUtils.isNotBlank(dom) ? getAdministrativeDivision(registerInfo.getDom()) : "";
+        String domDistrict = getAdministrativeDivision(registerInfo.getDom(), registerInfo.getJwd());
         baseInfo.setDomDistrict(domDistrict);
         // 住所所在经济开发区
         baseInfo.setEcoTecDevZone(enterpriseInfoBO != null ? DevZoneCodeUtils.getNameByCode(enterpriseInfoBO.getEcoTecDevZone()) : "");
@@ -392,27 +395,70 @@ public class BusinessDataServiceImpl implements BusinessDataService {
      * 获取行政区划信息
      *
      * @param address 地址
+     * @param lonLat  经纬度
      * @return String
      */
-    private String getAdministrativeDivision(String address) {
+    private String getAdministrativeDivision(String address, String lonLat) {
+        String formatLonLat = BusinessHandlingUtils.formatLonLat(lonLat);
+        if (StringUtils.isNotBlank(formatLonLat)) {
+            String[] array = formatLonLat.split(BusinessHandlingUtils.SEPARATOR_COMMA);
+            return getAdministrativeDivisionByLonLat(array[0], array[1]);
+        }
+        if (StringUtils.isNotBlank(address)) {
+            return getAdministrativeDivisionByAddress(address);
+        }
+        return StringUtils.EMPTY;
+    }
+
+    /**
+     * 获取行政区划信息
+     *
+     * @param address 地址
+     * @return String
+     */
+    private String getAdministrativeDivisionByAddress(String address) {
         logger.debug("GeoCodeUtils.getGeoCodeInfo()的参数值：address：【{}】", address);
-        GcQryResult gcQryResult = GeoCodeUtils.getGeoCodeInfo(address, "");
-        logger.debug("GeoCodeUtils.getGeoCodeInfo()的返回值：【{}】", gcQryResult);
+        GeoCodeQryResult geoCodeQryResult = GeoCodeUtils.getGeoCodeInfo(address, "");
+        logger.debug("GeoCodeUtils.getGeoCodeInfo()的返回值：【{}】", geoCodeQryResult);
 
         // 判断是否有查询结果
-        boolean haveResultFlag = GeoCodeUtils.isSuccess(gcQryResult) && Integer.parseInt(StringUtils.defaultIfEmpty(gcQryResult.getCount(), "0")) > 0;
+        boolean haveResultFlag = GeoCodeUtils.isSuccess(geoCodeQryResult) && Integer.parseInt(StringUtils.defaultIfEmpty(geoCodeQryResult.getCount(), "0")) > 0;
         if (!haveResultFlag) {
             logger.warn("address：【{}】，通过地址获取的地理编码信息为空！", address);
             return StringUtils.EMPTY;
         }
 
-        List<GcGeoCode> gcGeoCodeList = gcQryResult.getGcGeoCodes();
+        List<GeoCodeInfo> geoCodeInfoList = geoCodeQryResult.getGeoCodeInfoList();
         // 若只有一条查询结果，则取之
-        if (gcGeoCodeList != null && !gcGeoCodeList.isEmpty()) {
-            GcGeoCode gcGeoCode = gcGeoCodeList.get(0);
-            return connectAdministrativeDivision(gcGeoCode.getProvince(), gcGeoCode.getCity(), gcGeoCode.getDistrict());
+        if (geoCodeInfoList != null && !geoCodeInfoList.isEmpty()) {
+            GeoCodeInfo geoCodeInfo = geoCodeInfoList.get(0);
+            return connectAdministrativeDivision(geoCodeInfo.getProvince(), geoCodeInfo.getCity(), geoCodeInfo.getDistrict());
         }
         return StringUtils.EMPTY;
+    }
+
+    /**
+     * 获取行政区划信息
+     *
+     * @param longitude 经度
+     * @param latitude  纬度
+     * @return String
+     */
+    private String getAdministrativeDivisionByLonLat(String longitude, String latitude) {
+        logger.debug("ReGeoCodeUtils.getReGeoCodeInfo()的参数值：经纬度：【{},{}】", longitude, latitude);
+        ReGeoCodeQryResult qryResult = ReGeoCodeUtils.getReGeoCodeInfo(longitude, latitude);
+        logger.debug("ReGeoCodeUtils.getReGeoCodeInfo()的返回值：【{}】", qryResult);
+
+        // 判断是否有查询结果
+        boolean haveResultFlag = GdMapUtils.isSuccess(qryResult);
+        if (!haveResultFlag) {
+            logger.warn("经纬度：【{},{}】，通过经纬度获取的逆地理编码信息为空！", longitude, latitude);
+            return StringUtils.EMPTY;
+        }
+
+        ReGeoCodeInfo reGeoCodeInfo = qryResult.getReGeoCodeInfo();
+        AddressComponent addressComponent = reGeoCodeInfo == null ? new AddressComponent() : reGeoCodeInfo.getAddressComponent();
+        return connectAdministrativeDivision(addressComponent.getProvince(), addressComponent.getCity(), addressComponent.getDistrict());
     }
 
     /**
@@ -426,15 +472,15 @@ public class BusinessDataServiceImpl implements BusinessDataService {
     private String connectAdministrativeDivision(String province, String city, String district) {
         StringBuilder strBuilder = new StringBuilder();
         // 省
-        if (StringUtils.isNotBlank(province)) {
+        if (StringUtils.isNotBlank(province) && !EMPTY_ARRAY_STR.equals(province)) {
             strBuilder.append(province);
         }
         // 市，若为“市辖区”则不拼
-        if (StringUtils.isNotBlank(city) && !MUNICIPAL_DISTRICT.equals(city) && !city.equals(province)) {
+        if (StringUtils.isNotBlank(city) && !MUNICIPAL_DISTRICT.equals(city) && !EMPTY_ARRAY_STR.equals(city) && !city.equals(province)) {
             strBuilder.append(SLASH_SEPARATOR + city);
         }
         // 区
-        if (StringUtils.isNotBlank(district)) {
+        if (StringUtils.isNotBlank(district) && !EMPTY_ARRAY_STR.equals(district)) {
             strBuilder.append(SLASH_SEPARATOR + district);
         }
         return strBuilder.toString();

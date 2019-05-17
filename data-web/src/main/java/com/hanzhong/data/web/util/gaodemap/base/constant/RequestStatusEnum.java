@@ -1,4 +1,4 @@
-package com.hanzhong.data.web.util.gaodemap.constant;
+package com.hanzhong.data.web.util.gaodemap.base.constant;
 
 /**
  * 请求状态枚举

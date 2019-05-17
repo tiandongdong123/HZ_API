@@ -1,4 +1,4 @@
-package com.hanzhong.data.web.util.gaodemap.constant;
+package com.hanzhong.data.web.util.gaodemap.base.constant;
 
 /**
  * 批量查询控制

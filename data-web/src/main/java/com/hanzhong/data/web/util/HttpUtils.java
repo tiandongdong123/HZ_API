@@ -67,20 +67,20 @@ public class HttpUtils {
         try {
             // 创建httpget.
             HttpGet httpGet = new HttpGet(url);
-            logger.debug("executing request: {}", httpGet.getURI());
+            logger.debug("executing request: 【{}】", httpGet.getURI());
             // 执行get请求.
             CloseableHttpResponse response = httpclient.execute(httpGet);
             try {
                 // 获取响应实体
                 HttpEntity entity = response.getEntity();
                 // 打印响应状态
-                logger.debug("Response statusLine: {}", response.getStatusLine().toString());
+                logger.debug("Response statusLine: 【{}】", response.getStatusLine());
                 if (entity != null) {
                     // 打印响应内容长度
-                    logger.debug("Response content length: {}", entity.getContentLength());
+                    logger.debug("Response content length: 【{}】", entity.getContentLength());
                     // 打印响应内容
                     resultStr = EntityUtils.toString(entity, "UTF-8");
-                    logger.debug("Response content: {}", resultStr);
+                    logger.debug("Response content: 【{}】", resultStr);
                 }
             } finally {
                 response.close();
@@ -96,7 +96,7 @@ public class HttpUtils {
         }
 
         long endTime = System.currentTimeMillis();
-        logger.debug("requestByGet（）接口耗时：[{}]ms", endTime - startTime);
+        logger.debug("requestByGet（）接口耗时：【{}】ms", endTime - startTime);
 
         return resultStr;
     }
