@@ -21,8 +21,8 @@ if [ ! -d ${LOGS_DIR} ]; then
     mkdir ${LOGS_DIR}
 fi
 # log文件
-STDOUT_FILE=${LOGS_DIR}/stdout.log
-readonly STDOUT_FILE
+STD_OUT_FILE=${LOGS_DIR}/stdout.log
+readonly STD_OUT_FILE
 # 启动类
 START_CLASS="com.hanzhong.data.web.WebApplication"
 readonly START_CLASS
@@ -57,21 +57,27 @@ if [ -n "${BITS}" ]; then
 fi
 
 # 运行启动类（若stdout.log日志已存在，则先备份）
-if [ -f "${STDOUT_FILE}" ];then
+if [ -f "${STD_OUT_FILE}" ];then
      # 系统当前时间
     currentTime=$(date "+%Y%m%d%H%M%S")
-    mv ${STDOUT_FILE} ${LOGS_DIR}/stdout_${currentTime}_backup.log
+    mv ${STD_OUT_FILE} ${LOGS_DIR}/stdout_${currentTime}_backup.log
 fi
-nohup java ${JAVA_OPTS} ${JAVA_MEM_OPTS} ${JAVA_DEBUG_OPTS} ${JAVA_JMX_OPTS} -classpath ${CONF_DIR}:${LIB_JARS} ${START_CLASS} > ${STDOUT_FILE} 2>&1 &
+nohup java ${JAVA_OPTS} ${JAVA_MEM_OPTS} ${JAVA_DEBUG_OPTS} ${JAVA_JMX_OPTS} -classpath ${CONF_DIR}:${LIB_JARS} ${START_CLASS} > ${STD_OUT_FILE} 2>&1 &
 
 # 判断服务是否启动成功
-PIDS=`ps -ef | grep java | grep "${DEPLOY_DIR}/" | awk '{print $2}'`
-if [ -z "${PIDS}" ]; then
-        echo -e "\033[31m ERROR: The service of ${SERVER_NAME} startup failed ! \033[0m"
+P_ID_LIST=`ps -ef | grep java | grep "${DEPLOY_DIR}/" | awk '{print $2}'`
+readonly P_ID_LIST
+if [ -z "${P_ID_LIST}" ]; then
+        echo -e "\033[31m ERROR: The service of \"${SERVER_NAME}\" failed to start ! \033[0m"
     else
-        echo -e "\033[32m The service of ${SERVER_NAME} start successfully ! \033[0m"
-        echo -e "\033[32m PIDS: ${PIDS}  \033[0m"
-        echo -e "\033[32m STDOUT: ${STDOUT_FILE} \033[0m"
+        echo -e "\033[32m The service of \"${SERVER_NAME}\" starts successfully ! \033[0m"
+        echo -e "\033[32m P_ID_LIST: ${P_ID_LIST}  \033[0m"
+        echo -e "\033[32m STD_OUT_FILE: ${STD_OUT_FILE} \033[0m"
 fi
 
 echo -e "\033[36m ------------ Starting service end ------------ \033[0m"
+
+# 等待1s
+sleep 1
+# 查看日志
+${DEPLOY_DIR}/bin/showLog.sh
