@@ -299,19 +299,19 @@ public class BusinessDataServiceImpl implements BusinessDataService {
         //  经营(业务)范围
         baseInfo.setOpScope(ldRegisterInfoEntity.getOpScope());
         // 成立日期(格式：yyyy-MM-dd)
-        baseInfo.setEsDate(DateUtils.dateFormat(ldRegisterInfoEntity.getEsDate(), DateUtils.DEFAULT_DATE_FORMAT));
+        baseInfo.setEsDate(DateUtils.dateFormat(ldRegisterInfoEntity.getEsDate()));
         // 核准日期(格式：yyyy-MM-dd)
-        baseInfo.setApprDate(DateUtils.dateFormat(ldRegisterInfoEntity.getApprDate(), DateUtils.DEFAULT_DATE_FORMAT));
+        baseInfo.setApprDate(DateUtils.dateFormat(ldRegisterInfoEntity.getApprDate()));
         // 死亡日期(格式：yyyy-MM-dd)
-        baseInfo.setEndDate(DateUtils.dateFormat(ldRegisterInfoEntity.getEndDate(), DateUtils.DEFAULT_DATE_FORMAT));
+        baseInfo.setEndDate(DateUtils.dateFormat(ldRegisterInfoEntity.getEndDate()));
         // 吊销日期(格式：yyyy-MM-dd)
-        baseInfo.setRevDate(DateUtils.dateFormat(ldRegisterInfoEntity.getRevDate(), DateUtils.DEFAULT_DATE_FORMAT));
+        baseInfo.setRevDate(DateUtils.dateFormat(ldRegisterInfoEntity.getRevDate()));
         // 注销日期(格式：yyyy-MM-dd)
-        baseInfo.setCanDate(DateUtils.dateFormat(ldRegisterInfoEntity.getCanDate(), DateUtils.DEFAULT_DATE_FORMAT));
+        baseInfo.setCanDate(DateUtils.dateFormat(ldRegisterInfoEntity.getCanDate()));
         // 经营(驻在)期限自(格式：yyyy-MM-dd)
-        baseInfo.setOpFrom(DateUtils.dateFormat(ldRegisterInfoEntity.getOpFrom(), DateUtils.DEFAULT_DATE_FORMAT));
+        baseInfo.setOpFrom(DateUtils.dateFormat(ldRegisterInfoEntity.getOpFrom()));
         // 经营(驻在)期限至(格式：yyyy-MM-dd)
-        baseInfo.setOpTo((ldRegisterInfoEntity.getOpFrom() != null && ldRegisterInfoEntity.getOpTo() == null) ? CmnConstant.LONG_TERM_DATE : DateUtils.dateFormat(ldRegisterInfoEntity.getOpTo(), DateUtils.DEFAULT_DATE_FORMAT));
+        baseInfo.setOpTo((ldRegisterInfoEntity.getOpFrom() != null && ldRegisterInfoEntity.getOpTo() == null) ? CmnConstant.LONG_TERM_DATE : DateUtils.dateFormat(ldRegisterInfoEntity.getOpTo()));
         // 法定代表人
         baseInfo.setName(ldRegisterInfoEntity.getFrdb());
         // 登记机关

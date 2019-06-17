@@ -596,9 +596,9 @@ public class EntDrugServiceImpl implements EntDrugService {
         // 规格
         drugProtVarietyInfo.setSpec(tblDrugPrtcVarietyEntity.getSpec());
         // 保护起始日，格式：yyyy-MM-dd
-        drugProtVarietyInfo.setStartDate(DateUtils.dateFormat(tblDrugPrtcVarietyEntity.getStartDate(), DateUtils.DEFAULT_DATE_FORMAT));
+        drugProtVarietyInfo.setStartDate(DateUtils.dateFormat(tblDrugPrtcVarietyEntity.getStartDate()));
         // 保护终止日，格式：yyyy-MM-dd
-        drugProtVarietyInfo.setEndDate(DateUtils.dateFormat(tblDrugPrtcVarietyEntity.getEndDate(), DateUtils.DEFAULT_DATE_FORMAT));
+        drugProtVarietyInfo.setEndDate(DateUtils.dateFormat(tblDrugPrtcVarietyEntity.getEndDate()));
         // 生产企业
         drugProtVarietyInfo.setManuEnt(tblDrugPrtcVarietyEntity.getMfrsEnt());
         // 剂型
