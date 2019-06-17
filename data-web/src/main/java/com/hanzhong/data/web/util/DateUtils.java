@@ -1,5 +1,6 @@
 package com.hanzhong.data.web.util;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,10 +41,20 @@ public class DateUtils {
      * 格式化时间(格式：yyyy-MM-dd HH:mm:ss)
      *
      * @param date 日期
-     * @return String
+     * @return String 若date为null,则返回null
+     */
+    public static String dateTimeFormat(Date date) {
+        return dateFormat(date, DEFAULT_DATETIME_FORMAT);
+    }
+
+    /**
+     * 格式化时间(格式：yyyy-MM-dd)
+     *
+     * @param date 日期
+     * @return String 若date为null,则返回null
      */
     public static String dateFormat(Date date) {
-        return dateFormat(date, DEFAULT_DATETIME_FORMAT);
+        return dateFormat(date, DEFAULT_DATE_FORMAT);
     }
 
     /**
@@ -63,35 +74,63 @@ public class DateUtils {
     }
 
     /**
+     * 格式化时间(格式：yyyy-MM-dd  HH:mm:ss)
+     *
+     * @param date           日期
+     * @param defaultDateStr 默认值
+     * @return String 若时间为空，则返回默认值
+     */
+    public static String dateTimeFormatIfBlank(Date date, String defaultDateStr) {
+        return dateFormatIfBlank(date, DateUtils.DEFAULT_DATETIME_FORMAT, defaultDateStr);
+    }
+
+    /**
+     * 格式化时间(格式：yyyy-MM-dd)
+     *
+     * @param date           日期
+     * @param defaultDateStr 默认值
+     * @return String 若时间为空，则返回默认值
+     */
+    public static String dateFormatIfBlank(Date date, String defaultDateStr) {
+        return dateFormatIfBlank(date, DateUtils.DEFAULT_DATE_FORMAT, defaultDateStr);
+    }
+
+    /**
      * 格式化时间
      *
-     * @param date 时间
-     * @return String
+     * @param date           日期
+     * @param dateFormat     日期格式
+     * @param defaultDateStr 默认值
+     * @return String 若时间为空，则返回默认值
      */
-    private String dateFormatIfBlank(Date date) {
-        return date == null ? null : DateUtils.dateFormat(date, DateUtils.DEFAULT_DATE_FORMAT);
+    public static String dateFormatIfBlank(Date date, String dateFormat, String defaultDateStr) {
+        return date == null ? defaultDateStr : DateUtils.dateFormat(date, dateFormat);
     }
 
     /**
      * 将String转换成Date
      *
-     * @param dateStr 时间字符串，格式：yyyy-MM-dd HH:mm:ss
+     * @param dateStr 日期字符串，格式：yyyy-MM-dd
      * @return Date 若转换失败，则返回null
      */
     public static Date parse(String dateStr) {
-        return parse(dateStr, DEFAULT_DATETIME_FORMAT);
+        return parse(dateStr, DEFAULT_DATE_FORMAT);
     }
 
     /**
      * 将String转换成Date
      *
-     * @param dateStr    时间字符串
-     * @param dateFormat dateFormat 时间格式
-     * @return Date 若转换失败，则返回null
+     * @param dateStr    日期字符串
+     * @param dateFormat dateFormat 日期格式
+     * @return Date 若dateStr为空或转换失败，则返回null
      */
     public static Date parse(String dateStr, String dateFormat) {
         SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
         Date date = null;
+        if (StringUtils.isBlank(dateStr)) {
+            return null;
+        }
+
         try {
             date = sdf.parse(dateStr);
         } catch (ParseException e) {

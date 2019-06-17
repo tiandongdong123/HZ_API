@@ -17,11 +17,11 @@ import java.util.Map;
  *  @Date 2019/4/2 20:34 
  *  @Version  V1.0   
  */
-public class LdEntAnnualReportInfoAPIUtils {
+public class LdEntAnnualReportInfoApiUtils {
 
-    private static final Logger logger = LoggerFactory.getLogger(LdEntAnnualReportInfoAPIUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(LdEntAnnualReportInfoApiUtils.class);
 
-    private LdEntAnnualReportInfoAPIUtils() {
+    private LdEntAnnualReportInfoApiUtils() {
     }
 
     /**

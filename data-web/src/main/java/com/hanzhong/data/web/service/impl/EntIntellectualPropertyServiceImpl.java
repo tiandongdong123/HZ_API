@@ -557,9 +557,9 @@ public class EntIntellectualPropertyServiceImpl implements EntIntellectualProper
         // 起草单位
         standardInfo.setDraftUnit(tblStandardEntity.getDraftUnit());
         // 发布日期，格式：yyyy-MM-dd
-        standardInfo.setIssueDate(DateUtils.dateFormat(tblStandardEntity.getIssueDate(), DateUtils.DEFAULT_DATE_FORMAT));
+        standardInfo.setIssueDate(DateUtils.dateFormat(tblStandardEntity.getIssueDate()));
         // 实施日期，格式：yyyy-MM-dd
-        standardInfo.setForceDate(DateUtils.dateFormat(tblStandardEntity.getForceDate(), DateUtils.DEFAULT_DATE_FORMAT));
+        standardInfo.setForceDate(DateUtils.dateFormat(tblStandardEntity.getForceDate()));
         // 替代标准
         standardInfo.setOldStandard(tblStandardEntity.getOldStandard());
         // 废止日期，格式：yyyy-MM-dd
