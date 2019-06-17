@@ -212,7 +212,7 @@ public class LdDataController {
             // 密码
             pkgInfoVO.setPassword(packageInfo.getPassword());
             // 数据时间
-            String dataTimeStr = packageInfo.getDataPackTime() == null ? "" : DateUtils.dateFormat(new Date(packageInfo.getDataPackTime()));
+            String dataTimeStr = packageInfo.getDataPackTime() == null ? "" : DateUtils.dateTimeFormat(new Date(packageInfo.getDataPackTime()));
             pkgInfoVO.setDataTime(dataTimeStr);
             // 数量
             pkgInfoVO.setRecordCount(packageInfo.getRecordCount());
